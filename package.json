@@ -1,0 +1,21 @@
+{
+  "name": "xtocn-website",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^6.4.7",
+    "decap-server": "^3.9.1",
+    "marked": "^18.0.5",
+    "tailwindcss": "^4.3.1"
+  }
+}

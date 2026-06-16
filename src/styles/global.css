@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #1a56db;
+  --color-brand-blue-dark: #1040b0;
+  --color-brand-dark: #111827;
+  --color-brand-gray: #f3f4f6;
+  --color-brand-gray-dark: #1f2937;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.7;
+    color: #374151;
+    background: #fff;
+  }
+  h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; color: #111827; }
+  a { color: var(--color-brand-blue); transition: color 0.2s; }
+  a:hover { color: var(--color-brand-blue-dark); }
+}
+
+@layer components {
+  .container-main {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--color-brand-blue);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--color-brand-blue-dark);
+    color: #fff;
+  }
+  .btn-outline {
+    border: 2px solid var(--color-brand-blue);
+    color: var(--color-brand-blue);
+    background: transparent;
+  }
+  .btn-outline:hover {
+    background: var(--color-brand-blue);
+    color: #fff;
+  }
+  .section-padding {
+    padding: 5rem 0;
+  }
+  .section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #111827;
+  }
+  .section-subtitle {
+    text-align: center;
+    color: #6b7280;
+    max-width: 36rem;
+    margin: 0 auto 3rem;
+  }
+  .card-light {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+  }
+  .card-light:hover {
+    border-color: var(--color-brand-blue);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .cms-content h1, .cms-content h2, .cms-content h3 { color: #111827; margin: 1.5em 0 0.5em; }
+  .cms-content p { margin-bottom: 1em; line-height: 1.8; }
+  .cms-content img { border-radius: 0.5rem; max-width: 100%; }
+  .cms-content ul, .cms-content ol { padding-left: 1.5rem; margin-bottom: 1em; }
+  .cms-content blockquote {
+    border-left: 3px solid var(--color-brand-blue);
+    padding-left: 1rem;
+    color: #6b7280;
+    margin: 1.5em 0;
+  }
+}

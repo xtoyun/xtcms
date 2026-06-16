@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('posts'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="文章">
+  <section class="py-20">
+    <div class="container-main max-w-3xl">
+      <h1 class="text-4xl font-bold text-white mb-4"><span class="text-brand-gold">文章</span></h1>
+      <p class="text-gray-400 mb-12">互联网营销 · 品牌建设 · 数字化转型</p>
+
+      {
+        posts.length > 0 ? (
+          <div class="space-y-8">
+            {posts.map(post => (
+              <article class="card group">
+                <a href={`/posts/${post.id}`} class="block">
+                  <time class="text-xs text-gray-600">{post.data.date.toLocaleDateString('zh-CN')}</time>
+                  <h2 class="text-xl font-bold text-white group-hover:text-brand-gold transition-colors mt-2 mb-2">
+                    {post.data.title}
+                  </h2>
+                  {post.data.description && <p class="text-gray-500 text-sm">{post.data.description}</p>}
+                  {post.data.tags && (
+                    <div class="flex gap-2 mt-3">
+                      {post.data.tags.map(tag => (
+                        <span class="text-xs px-2 py-0.5 rounded bg-white/5 text-gray-500">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </a>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="text-center text-gray-600 py-20">
+            <p class="text-lg">还没有文章</p>
+            <p class="text-sm mt-2">精彩内容即将上线</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

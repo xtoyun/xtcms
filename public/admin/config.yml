@@ -1,0 +1,37 @@
+backend:
+  name: git-gateway
+  branch: main
+  repo: xtocn/xtocn-website
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "posts"
+    label: "文章"
+    folder: "src/content/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "描述", name: "description", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - { label: "标签", name: "tags", widget: "list", required: false }
+      - { label: "封面图", name: "image", widget: "image", required: false }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "项目案例"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "项目名称", name: "title", widget: "string" }
+      - { label: "描述", name: "description", widget: "text" }
+      - { label: "分类", name: "category", widget: "select", options: ["品牌建设", "网站建设", "网络营销", "自媒体", "数字化管理"] }
+      - { label: "客户", name: "client", widget: "string", required: false }
+      - { label: "日期", name: "date", widget: "datetime", required: false }
+      - { label: "封面图", name: "image", widget: "image", required: false }
+      - { label: "精选项目", name: "featured", widget: "boolean", default: false }
+      - { label: "链接", name: "link", widget: "string", required: false }

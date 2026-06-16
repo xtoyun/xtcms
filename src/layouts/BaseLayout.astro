@@ -1,0 +1,130 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description, image } = Astro.props;
+const siteTitle = title ? `${title} - 雄韬网络` : '雄韬网络 - 网络营销品牌';
+const siteDescription = description || '15年互联网营销品牌，为数百家公司提供专业的网络营销咨询服务';
+
+const navItems = [
+  { label: '首页', href: '/' },
+  { label: '项目', href: '/#projects' },
+  { label: '服务', href: '/#services' },
+  { label: '文章', href: '/posts' },
+  { label: '关于', href: '/about' },
+  { label: '联系', href: '/contact' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{siteTitle}</title>
+  <meta name="description" content={siteDescription} />
+  {image && <meta property="og:image" content={image} />}
+  <meta property="og:title" content={siteTitle} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+
+<body class="min-h-screen flex flex-col bg-white text-gray-700">
+  <!-- Header - clean white, matching original Elementor style -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+    <div class="container-main flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 shrink-0">
+        <img src="/logo.svg" alt="雄韬网络" class="h-10 w-auto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span class="hidden text-xl font-bold text-gray-900 tracking-wide">雄韬<span class="text-brand-blue">网络</span></span>
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-1">
+        {navItems.map(item => (
+          <a
+            href={item.href}
+            class="px-3 py-2 text-sm text-gray-600 hover:text-brand-blue hover:bg-gray-50 rounded transition-colors"
+          >
+            {item.label}
+          </a>
+        ))}
+        <a href="/contact" class="btn btn-primary text-sm !py-2 !px-4 ml-2">免费咨询</a>
+      </nav>
+
+      <!-- Mobile -->
+      <button id="mobile-toggle" class="md:hidden p-2 text-gray-600" aria-label="菜单">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100 bg-white">
+      <div class="container-main py-4 flex flex-col gap-2">
+        {navItems.map(item => (
+          <a href={item.href} class="px-3 py-2 text-gray-600 hover:text-brand-blue rounded">{item.label}</a>
+        ))}
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <slot />
+  </main>
+
+  <!-- Footer - dark, matching original -->
+  <footer class="bg-brand-gray-dark text-gray-400 py-12">
+    <div class="container-main">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <h4 class="text-white font-bold mb-3 text-lg">雄韬<span class="text-brand-blue">网络</span></h4>
+          <p class="text-sm leading-relaxed">
+            15年互联网营销品牌<br />
+            为数百家公司提供专业服务<br />
+            打造网络品牌 · 自媒体品牌 · 互联网营销
+          </p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-3">服务项目</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/#services" class="hover:text-white transition-colors">品牌建设</a></li>
+            <li><a href="/#services" class="hover:text-white transition-colors">网站建设</a></li>
+            <li><a href="/#services" class="hover:text-white transition-colors">网络营销</a></li>
+            <li><a href="/#services" class="hover:text-white transition-colors">数字化管理</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-3">快速链接</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/posts" class="hover:text-white transition-colors">文章</a></li>
+            <li><a href="/#projects" class="hover:text-white transition-colors">项目案例</a></li>
+            <li><a href="/about" class="hover:text-white transition-colors">关于我们</a></li>
+            <li><a href="/contact" class="hover:text-white transition-colors">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-3">联系方式</h4>
+          <ul class="space-y-2 text-sm">
+            <li>📧 xc@xtocn.com</li>
+            <li>📞 020-28186541</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-6 text-center text-xs">
+        <p>&copy; {new Date().getFullYear()} 雄韬网络. All rights reserved.</p>
+        <p class="mt-1">
+          <a href="https://beian.miit.gov.cn/" class="hover:text-white">粤ICP备xxxxxx号</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script is:inline>
+    document.getElementById('mobile-toggle')?.addEventListener('click', () => {
+      document.getElementById('mobile-menu')?.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>
