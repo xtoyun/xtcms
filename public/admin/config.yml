@@ -1,8 +1,8 @@
 backend:
   name: server-api
 
-media_folder: public/assets/uploads
-public_folder: /assets/uploads
+media_folder: public/uploads
+public_folder: /uploads
 
 site_url: https://www.xtocn.com
 logo:
