@@ -129,8 +129,16 @@ collections:
     label_singular: 留言
     folder: src/content/messages
     create: false
+    summary: "{{read | ternary('✅ ', '🆕 ')}}{{name}} — {{date}}"
     editor:
       preview: false
+    view_groups:
+      - label: 🆕 未读留言
+        field: read
+        pattern: "false"
+      - label: ✅ 已读留言
+        field: read
+        pattern: "true"
     fields:
       - { label: 姓名, name: name, widget: string }
       - { label: 公司, name: company, widget: string, required: false }
