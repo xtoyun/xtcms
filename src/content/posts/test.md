@@ -3,7 +3,7 @@ title: test
 description: ''
 date: 2026-06-17
 tags: []
-image: /assets/uploads/3088372_astronomy_evolution_galaxy_planets_space_icon.png
+image: /uploads/3088372_astronomy_evolution_galaxy_planets_space_icon.png
 pinned: false
 draft: false
 link: ''
