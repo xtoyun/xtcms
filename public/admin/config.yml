@@ -9,6 +9,12 @@ logo:
   src: /logo.png
 app_title: 雄韬智网
 
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+  lowercase: true
+
 collections:
   - name: posts
     label: 文章
