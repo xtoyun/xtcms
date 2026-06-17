@@ -15,7 +15,7 @@ collections:
     label_singular: 文章
     folder: src/content/posts
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{fields._slug}}"
+    slug: "{{fields._slug}}"
     summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
     editor:
       preview: false
