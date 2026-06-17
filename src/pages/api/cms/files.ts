@@ -21,7 +21,7 @@ const CONTENT_DIRS = [
 ];
 
 /** Directories to scan for asset files */
-const ASSET_DIRS = ['public/uploads'];
+const ASSET_DIRS = ['public/assets/uploads'];
 
 /** Config files to include */
 const CONFIG_FILES = ['public/admin/config.yml'];
