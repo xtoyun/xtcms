@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getContent } from '../lib/content';
+import { serviceIcon } from '../lib/service-icons';
 
 const services = getContent('src/content/services');
 ---
@@ -13,14 +14,15 @@ const services = getContent('src/content/services');
 
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:30px">
         {services.sort((a,b)=> (a.data.order||0) - (b.data.order||0)).map(s => (
-          <div style="border:1px solid #eee;padding:40px 30px;transition:border-color 0.3s">
-            <div style="font-size:32px;margin-bottom:20px">{s.data.icon}</div>
+          <a href={`/services/${s.id}`} style="text-decoration:none;color:inherit;display:block;border:1px solid #eee;padding:40px 30px;transition:border-color .3s,box-shadow .3s">
+            <div style="margin-bottom:20px" set:html={serviceIcon(s.id, 36)} />
             <h3 style="font-size:22px;font-weight:400;color:#000;margin-bottom:12px">{s.data.title}</h3>
             <p style="font-size:15px;color:#7C7F83;line-height:1.8;margin-bottom:20px">{s.data.description}</p>
-            {s.body && (
-              <div style="font-size:14px;color:#7C7F83;line-height:1.8;border-top:1px solid #eee;padding-top:20px" set:html={s.body} />
-            )}
-          </div>
+            <span style="font-size:13px;color:#999;display:flex;align-items:center;gap:4px">
+              详细了解
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
         ))}
       </div>
 

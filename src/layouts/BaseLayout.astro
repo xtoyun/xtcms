@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import FloatingContact from '../components/shared/FloatingContact.astro';
 
 export interface Props { title?: string; description?: string; }
 
@@ -23,105 +24,127 @@ const navItems = [
   <title>{siteTitle}</title>
   <meta name="description" content={description || '15年互联网营销品牌，为数百家公司提供网络营销咨询服务'} />
   <link rel="icon" type="image/png" href="/favicon.png" />
+  <style is:inline>
+    /* Desktop sidebar */
+    .sidebar { position:fixed;left:0;top:0;width:300px;height:100vh;background:#fff;display:flex;flex-direction:column;padding:50px 40px;z-index:40; }
+    .sidebar-logo { width:80px;height:auto;display:block;margin-bottom:64px; }
+    .sidebar nav { flex:1;display:flex;flex-direction:column;gap:8px; }
+    .sidebar nav a { font-size:18px;font-weight:400;color:#000;text-decoration:none;padding:6px 0;transition:opacity .2s; }
+    .sidebar nav a:hover { opacity:.6; }
+    .sidebar-foot { border-top:1px solid #eee;padding-top:20px;font-size:15px;color:#7C7F83; }
+    .sidebar-foot .sf-row { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+    .sidebar-foot a { color:#7C7F83;text-decoration:none; }
+
+    /* Main area */
+    .main-wrap { margin-left:300px;min-height:100vh;display:flex;flex-direction:column; }
+    .main-wrap main { flex:1; }
+
+    /* Footer */
+    .ftr { background:#fff;color:#999;padding:40px 0 30px;border-top:1px solid #eee; }
+    .ftr-inner { max-width:1200px;margin:0 auto;padding:0 40px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:30px;margin-bottom:20px; }
+    .ftr-l { font-size:13px;line-height:2; }
+    .ftr-l a { color:#999;text-decoration:none; }
+    .ftr-r { font-size:13px;line-height:2;text-align:right; }
+    .ftr-btm { text-align:center; }
+    .ftr-btm a { color:#999;text-decoration:none;font-size:13px; }
+
+    /* Mobile header */
+    .mob-hdr { display:none;position:sticky;top:0;z-index:50;background:#fff;padding:0 16px;height:56px;align-items:center;justify-content:space-between;border-bottom:1px solid #eee; }
+    .mob-hdr-logo { height:32px;width:auto; }
+    .mob-hdr-btn { background:none;border:none;padding:8px;cursor:pointer;color:#000; }
+    .mob-menu { position:fixed;inset:0;z-index:60;background:#fff;padding:24px;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease; }
+    .mob-menu.open { transform:translateX(0); }
+    .mob-menu-close { align-self:flex-end;background:none;border:none;font-size:28px;cursor:pointer;color:#000;padding:4px 8px; }
+    .mob-menu-logo { font-size:18px;font-weight:600;color:#000;text-decoration:none;margin-bottom:24px; }
+    .mob-menu nav { display:flex;flex-direction:column;gap:4px; }
+    .mob-menu nav a { display:block;padding:12px 0;font-size:17px;color:#000;text-decoration:none;border-bottom:1px solid #f0f0f0; }
+    .mob-menu-foot { margin-top:auto;padding-top:20px;border-top:1px solid #eee;font-size:15px;color:#7C7F83;line-height:2; }
+
+    /* Smaller buttons */
+    .btn-sm { font-size:14px !important;padding:8px 16px !important;min-height:36px !important; }
+
+    @media (max-width:768px) {
+      .sidebar { display:none; }
+      .main-wrap { margin-left:0; }
+      .mob-hdr { display:flex; }
+      .ftr-inner { flex-direction:column;gap:16px; }
+      .ftr-r { text-align:left; }
+    }
+  </style>
 </head>
 
-<body class="min-h-screen flex">
+<body class="min-h-screen">
 
-  <!-- Left Sidebar - matching The7 theme vertical header -->
-  <aside class="fixed left-0 top-0 h-full bg-white flex flex-col z-50" style="width:300px;padding:50px 40px">
-    <!-- Logo -->
-    <a href="/" class="no-underline mb-16 block">
-      <img src="/logo.png" alt="雄韬网络" style="width:80px;height:auto;display:block" />
-    </a>
-
-    <!-- Nav -->
-    <nav class="flex-1">
-      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:24px">
-        {navItems.map(item => (
-          <li>
-            <a href={item.href}
-              class="font-normal text-black no-underline hover:opacity-70 transition-opacity block"
-              style="font-size:18px;font-weight:400;line-height:1.4"
-            >{item.label}</a>
-          </li>
-        ))}
-      </ul>
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar">
+    <a href="/"><img src="/logo.png" alt="雄韬网络" class="sidebar-logo" /></a>
+    <nav>
+      {navItems.map(item => (<a href={item.href}>{item.label}</a>))}
     </nav>
-
-    <!-- Contact info at bottom -->
-    <div class="mt-auto pt-10" style="border-top:1px solid #eee">
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:15px;color:#7C7F83;padding-top:20px">
-        <div class="flex items-center gap-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          <a href="mailto:xc@xtocn.com" style="color:#7C7F83;text-decoration:none">xc@xtocn.com</a>
-        </div>
-        <div class="flex items-center gap-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <span>020-28186541</span>
-        </div>
+    <div class="sidebar-foot">
+      <div class="sf-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <a href="mailto:xc@xtocn.com">xc@xtocn.com</a>
+      </div>
+      <div class="sf-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>020-28186541</span>
       </div>
     </div>
   </aside>
 
-  <!-- Mobile hamburger (only shown on small screens) -->
-  <button id="mobile-toggle" class="hidden max-md:flex fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded" aria-label="菜单">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-  </button>
+  <!-- Mobile Header -->
+  <header class="mob-hdr">
+    <a href="/"><img src="/logo.png" alt="雄韬网络" class="mob-hdr-logo" /></a>
+    <button class="mob-hdr-btn" id="mob-btn" aria-label="菜单">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+    </button>
+  </header>
 
-  <!-- Mobile menu overlay -->
-  <div id="mobile-menu" class="hidden fixed inset-0 z-40 bg-white p-8 flex flex-col gap-4 overflow-auto">
-    <button id="mobile-close" class="self-end p-2 text-2xl">&times;</button>
-    <a href="/" class="text-lg font-bold text-black no-underline">雄韬官网</a>
-    <nav class="flex flex-col gap-3">
-      {navItems.map(item => (
-        <a href={item.href} class="text-base text-black no-underline py-2 border-b border-gray-100">{item.label}</a>
-      ))}
+  <!-- Mobile Menu -->
+  <div class="mob-menu" id="mob-menu">
+    <button class="mob-menu-close" id="mob-close">&times;</button>
+    <a href="/" class="mob-menu-logo">雄韬智网</a>
+    <nav>
+      {navItems.map(item => (<a href={item.href}>{item.label}</a>))}
     </nav>
-    <div class="mt-4 pt-4 border-t border-gray-200 text-sm" style="color:#7C7F83">
+    <div class="mob-menu-foot">
       <p>📧 xc@xtocn.com</p>
       <p>📞 020-28186541</p>
     </div>
   </div>
 
-  <!-- Main content area -->
-  <div class="flex-1 flex flex-col min-h-screen" style="margin-left:300px">
-    <main class="flex-1"><slot /></main>
+  <!-- Main -->
+  <div class="main-wrap">
+    <main><slot /></main>
 
-    <!-- Footer - matching original: white bg, gray text -->
-    <footer style="background:#fff;color:#999;padding:40px 0 30px;border-top:1px solid #eee">
-      <div style="max-width:1200px;margin:0 auto;padding:0 40px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:30px;margin-bottom:20px">
-          <div style="font-size:13px;line-height:2">
-            <p style="margin:0;color:#999">&copy; {new Date().getFullYear()} 雄韬官网. All rights reserved.</p>
-            <p style="margin:0">
-              <a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow" style="color:#999;text-decoration:none">粤ICP备14002355号</a>
-            </p>
-            <p style="margin:0">
-              <a href="https://beian.mps.gov.cn/" target="_blank" rel="nofollow" style="color:#999;text-decoration:none">粤公网安备44011302004411号</a>
-            </p>
-          </div>
-          <div style="font-size:13px;line-height:2;text-align:right">
-            <p style="margin:0;color:#999">📧 xc@xtocn.com</p>
-            <p style="margin:0;color:#999">📞 020-28186541</p>
-          </div>
+    <footer class="ftr">
+      <div class="ftr-inner">
+        <div class="ftr-l">
+          <p>&copy; {new Date().getFullYear()} 雄韬智网. All rights reserved.</p>
+          <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">粤ICP备14002355号</a></p>
+          <p><a href="https://beian.mps.gov.cn/" target="_blank" rel="nofollow">粤公网安备44011302004411号</a></p>
         </div>
-        <div style="text-align:center">
-          <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false" style="color:#999;text-decoration:none;font-size:13px">↑ 返回顶部</a>
+        <div class="ftr-r">
+          <p>📧 xc@xtocn.com</p>
+          <p>📞 020-28186541</p>
         </div>
+      </div>
+      <div class="ftr-btm">
+        <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">↑ 返回顶部</a>
       </div>
     </footer>
   </div>
 
+  <FloatingContact />
+
   <script is:inline>
-    (function(){
-      const toggle = document.getElementById('mobile-toggle');
-      const menu = document.getElementById('mobile-menu');
-      const close = document.getElementById('mobile-close');
-      if(toggle&&menu){toggle.onclick=()=>menu.classList.remove('hidden');}
-      if(close&&menu){close.onclick=()=>menu.classList.add('hidden');}
-      // Show mobile toggle on small screens
-      if(window.innerWidth<768){toggle&&toggle.classList.remove('hidden');}
-    })();
+    document.getElementById('mob-btn')?.addEventListener('click',function(){
+      document.getElementById('mob-menu')?.classList.add('open');
+    });
+    document.getElementById('mob-close')?.addEventListener('click',function(){
+      document.getElementById('mob-menu')?.classList.remove('open');
+    });
   </script>
 </body>
 </html>

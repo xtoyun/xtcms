@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SafeImage from '../../components/shared/SafeImage.astro';
 import { getContent } from '../../lib/content';
 
 const allProjects = getContent('src/content/projects');
@@ -22,11 +23,7 @@ const categories = [...new Set(allProjects.map(p => p.data.category))];
               <a href={`/projects/${project.id}`} style="text-decoration:none;color:inherit;display:block">
                 <!-- Image -->
                 <div style="aspect-ratio:4/3;background:#f5f5f5;overflow:hidden;margin-bottom:20px">
-                  {project.data.image ? (
-                    <img src={project.data.image} alt={project.data.title} style="width:100%;height:100%;object-fit:cover" />
-                  ) : (
-                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:14px">{project.data.title}</div>
-                  )}
+                  <SafeImage src={project.data.image} alt={project.data.title} aspect="4/3" />
                 </div>
                 <!-- Info -->
                 <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">

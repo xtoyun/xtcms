@@ -6,7 +6,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 
-const SECRET = process.env.CMS_SECRET || 'xtocn-cms-secret-change-in-production-2026';
+import { CMS_SECRET } from '../../../lib/auth-config';
+const SECRET = CMS_SECRET;
 
 interface FileChange {
   action: 'create' | 'update' | 'move' | 'delete';

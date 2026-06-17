@@ -1,46 +1,275 @@
-# Astro Starter Kit: Basics
+# 雄韬智网 / XTOCN Website
 
-```sh
-npm create astro@latest -- --template basics
+> **轻建网 · AI 辅助 · 想做什么就做什么**
+
+一套 AI 辅助的轻量建站方案。不做主题市场、不做插件生态、不做数据库——只给你一套干净的代码骨架，配上在线编辑后台，剩下的事交给 AI。
+
+想加一个页面？告诉 AI，它写。
+想改一种布局？告诉 AI，它改。
+想接一个第三方服务？告诉 AI，它配。
+
+你的网站你做主，AI 是你的施工队。
+
+**演示站**：[www.xtocn.com](https://www.xtocn.com)
+
+## 界面预览
+
+### 网站前台
+
+![雄韬智网首页](public/screenshot-site.png)
+
+### 内容管理后台
+
+![CMS 后台登录](public/screenshot-admin.png)
+
+---
+
+## 传统建站的痛点
+
+用 PHP 建站（WordPress、DedeCMS 等），拉一个能跑的网站要走完一整条链路：
+
+```
+装 PHP → 装 MySQL → 装 Apache/Nginx → 配虚拟主机
+→ 创建数据库 → 导入 SQL → 配 wp-config.php
+→ 装主题 → 装插件 → 插件冲突 → 调版本 → 终于能用了
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+上线之后呢？
 
-## 🚀 Project Structure
+- 每次页面请求：PHP 解析 → 查数据库 → 拼 HTML → 返回。几十次数据库查询，一个字：**慢**。
+- 想加个功能：找插件 → 不兼容 → 找替代 → 改了代码升级又覆盖。**扩展是噩梦**。
+- 换个服务器：导出 SQL → 传文件 → 导入 SQL → 改数据库密码 → 祈祷不出错。**迁移像搬家**。
 
-Inside of your Astro project, you'll see the following folders and files:
+## 这套方案怎么做
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
+一个 Node.js，一个命令，跑起来就是完整网站 + 后台。
+
+```
+                         ┌──────────────┐
+                         │   浏览器      │
+                         └──────┬───────┘
+                                │
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                  ▼
+        / (首页)          /posts (文章)      /admin (后台)
+              │                 │                  │
+              └─────────────────┼──────────────────┘
+                                │
+                         ┌──────▼───────┐
+                         │  Astro SSR    │  ← 一个 Node 进程
+                         │  直接读文件    │
+                         └──────┬───────┘
+                                │
+                    ┌───────────┼───────────┐
+                    ▼           ▼           ▼
+               posts.md    projects.md   settings.yml
+               (文章)       (案例)        (配置)
+```
+
+- **没有 PHP**：不需要装任何语言环境，Node.js 一把梭
+- **没有数据库**：内容是 `.md` 文件，打开就能看，改完就生效
+- **没有 Apache/Nginx**：Astro 自带服务端，一个端口搞定
+- **没有插件系统**：加功能就是加文件，代码在你手上，想怎么改怎么改
+
+---
+
+## 上手三步
+
+### 1. 安装
+
+```bash
+git clone <repo-url> && cd xtocn-website && npm install
+```
+
+### 2. 本地跑起来
+
+```bash
+npm run dev
+```
+
+浏览器打开 `http://localhost:4321`，网站已经在运行了。
+
+打开 `http://localhost:4321/admin`，登录编辑内容。默认账号 `admin` / `admin`。
+
+### 3. 部署到服务器
+
+```bash
+npm run build
+```
+
+传这 4 个到服务器：
+
+```
+dist/          # 程序
+public/        # 附件
+src/content/   # 内容
+.env           # 配置
+```
+
+服务器上：
+
+```bash
+npm install --production && npm start
+```
+
+网站就上线了。
+
+### 宝塔面板部署
+
+如果你用宝塔管理服务器，4 步上线：
+
+**1. 装 Node.js**
+
+宝塔软件商店 → 搜索「Node.js版本管理器」→ 安装 → 安装 Node 22
+
+**2. 上传项目**
+
+```
+宝塔文件 → /www/wwwroot/xtocn/
+把 dist/、public/、src/content/、.env、package.json 传上去
+```
+
+**3. 添加 Node 项目**
+
+宝塔网站 → Node 项目 → 添加 Node 项目：
+
+| 配置项 | 值 |
+|--------|-----|
+| 项目目录 | `/www/wwwroot/xtocn` |
+| 启动文件 | `dist/server/entry.mjs` |
+| 启动命令 | `npm start` |
+| 端口 | `4321` |
+| 绑定域名 | 你的域名 |
+
+**4. 放行端口 + 域名解析**
+
+- 宝塔安全 → 放行 `4321` 端口
+- 域名 DNS 解析到服务器 IP
+
+如果需要用域名直接访问（不带端口号），在宝塔网站 → 添加反向代理：
+
+```
+目标 URL: http://127.0.0.1:4321
+发送域名: 你的域名
+```
+
+完成后访问你的域名，网站上线。
+
+---
+
+## 对比
+
+| | PHP 建站（WordPress 等） | 这套方案 |
+|---|---|---|
+| 运行环境 | PHP + MySQL + Apache/Nginx | Node.js 一个进程 |
+| 数据库 | 需要，增删改查几十次/页 | 不需要，直接读文件 |
+| 页面速度 | 200ms ~ 2s（查库拼页面） | 50ms ~ 100ms（文件即内容） |
+| 扩展功能 | 插件市场，兼容靠运气 | 改代码，完全自控 |
+| 迁移服务器 | 导 SQL + 传文件 + 改配置 | 复制 4 个目录 |
+| 备份 | 数据库备份 + 文件备份 | git push 或 tar 打包 |
+| 学曲线 | PHP + SQL + WordPress 体系 | HTML + Markdown |
+
+---
+
+## 架构：四层分离
+
+```
+┌────────────────────────────────┐
+│  ④ 展示层  用户看到的页面        │  ← 改这里换皮肤
+│    Astro .astro 文件            │
+├────────────────────────────────┤
+│  ③ 内容层  你的文章/案例         │  ← 不碰代码也能改
+│    src/content/*.md             │    通过 CMS 后台编辑
+├────────────────────────────────┤
+│  ② 编辑层  浏览器里的后台        │
+│    Sveltia CMS (/admin)         │
+├────────────────────────────────┤
+│  ① 存储层  服务器硬盘            │
+│    文件系统，没有数据库          │
+└────────────────────────────────┘
+```
+
+每层独立。换样式不改内容，写文章不改代码，迁移服务器复制目录即走。
+
+---
+
+## 内容管理
+
+访问 `/admin`，在线编辑：
+
+- 📝 **文章** — 标题、描述、标签、封面图、置顶、草稿
+- 🎯 **项目案例** — 分类、客户、封面图、精选、置顶
+- 🛠 **服务介绍** — 图标(emoji)、描述、排序
+- 📄 **单页面** — 关于我们等
+- ⚙ **站点设置** — 页脚信息
+
+CMS 保存后前端即时生效，**不用重启、不用清缓存**。
+
+---
+
+## 扩展指南
+
+### 加页面
+
+在 `src/pages/` 新建 `xxx.astro`，路径自动为 `/xxx`。
+
+### 加内容类型
+
+编辑 `public/admin/config.yml`，加一个 collection。然后在 `src/content/` 建对应文件夹。最后写个页面读取就行了——不用装插件。
+
+### 改样式
+
+Tailwind CSS v4，直接在 HTML/组件上写原子类。全局样式在 `src/styles/global.css`。
+
+### 换布局
+
+`src/layouts/BaseLayout.astro` 是全局壳（导航栏 + 页脚 + 右侧悬浮咨询栏），改一处全站生效。
+
+---
+
+## 项目文件
+
+```
+xtocn-website/
+├── public/admin/         # CMS 后台
+├── src/pages/            # 网站页面
+├── src/content/          # 📝 你的内容（Markdown）
+│   ├── posts/            #   文章
+│   ├── projects/         #   项目案例
+│   ├── services/         #   服务
+│   └── pages/            #   单页面
+├── src/components/       # 组件
+├── src/layouts/          # 布局
+├── src/lib/              # 工具
+├── .env.example          # 环境变量模板
 └── package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## 环境变量
 
-## 🧞 Commands
+复制 `.env.example` → `.env`：
 
-All commands are run from the root of the project, from a terminal:
+```
+CMS_USER=admin
+CMS_PASS=你的密码
+CMS_SECRET=随机字符串
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+---
 
-## 👀 Want to learn more?
+## 轻建网哲学
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+传统建站给你一个成品房子，你只能在里面摆家具。插件市场像个建材超市——看着什么都有，真要用的时候不是不兼容就是收费。
+
+**轻建网给你的是毛坯房 + 一支施工队（AI）。**
+
+```
+传统 CMS：   [主题] + [插件A] + [插件B] → 💥 冲突 → 妥协
+轻建网：     想法 → 告诉 AI → 代码落地 → 完全符合预期
+```
+
+不改配置、不拼插件、不用 MySQL。代码是你自己的，AI 帮你写，你审一下改一下就行。快、轻、自由。
+
+## License
+
+MIT

@@ -2,16 +2,13 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import crypto from 'node:crypto';
-
-const SECRET = process.env.CMS_SECRET || 'xtocn-cms-secret-change-in-production-2026';
-const ADMIN_USER = process.env.CMS_USER || 'admin';
-const ADMIN_PASS = process.env.CMS_PASS || 'xtocn2026';
+import { CMS_SECRET, CMS_USER, CMS_PASS } from '../../../lib/auth-config';
 
 function createToken(username: string): string {
   const payload = Buffer.from(
     JSON.stringify({ username, exp: Date.now() + 24 * 60 * 60 * 1000 }),
   ).toString('base64url');
-  const signature = crypto.createHmac('sha256', SECRET).update(payload).digest('base64url');
+  const signature = crypto.createHmac('sha256', CMS_SECRET).update(payload).digest('base64url');
   return `${payload}.${signature}`;
 }
 
@@ -27,7 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    if (username !== ADMIN_USER || password !== ADMIN_PASS) {
+    if (username !== CMS_USER || password !== CMS_PASS) {
       return new Response(JSON.stringify({ error: '用户名或密码错误' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },

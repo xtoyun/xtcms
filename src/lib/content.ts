@@ -26,10 +26,12 @@ function parseFrontmatter(raw: string): { data: Record<string, any>; body: strin
       continue;
     }
 
-    const kvMatch = line.match(/^(\w+):\s*["']?(.*)["']?\s*$/);
+    const kvMatch = line.match(/^(\w+):\s*(.*)\s*$/);
     if (kvMatch) {
       currentKey = kvMatch[1];
-      const val = kvMatch[2] || '';
+      let val = (kvMatch[2] || '').trim();
+      // Strip surrounding quotes (single or double)
+      val = val.replace(/^["'](.*)["']$/, '$1');
       // Parse booleans
       if (val === 'true') { data[currentKey] = true; }
       else if (val === 'false') { data[currentKey] = false; }
@@ -62,6 +64,10 @@ export function getContent(dirPath: string): ContentItem[] {
       const raw = fs.readFileSync(path.join(absPath, f), 'utf8');
       const { data, body } = parseFrontmatter(raw);
       data._slug = f.replace(/\.md$/, '');
+      // Clean up empty/invalid image values — treat empty strings as missing
+      if (data.image === '' || data.image === null || data.image === undefined) {
+        delete data.image;
+      }
       return {
         id: f.replace(/\.md$/, ''),
         slug: f.replace(/\.md$/, ''),

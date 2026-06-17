@@ -4,8 +4,10 @@ import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { CMS_SECRET } from '../../../lib/auth-config';
 
-const SECRET = process.env.CMS_SECRET || 'xtocn-cms-secret-change-in-production-2026';
+// Re-export for local use
+const SECRET = CMS_SECRET;
 
 /** Directories to scan for content files */
 const CONTENT_DIRS = [

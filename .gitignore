@@ -13,12 +13,24 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment variables
+# environment variables (may contain secrets)
 .env
 .env.production
+.env.local
 
 # macOS-specific files
 .DS_Store
 
 # jetbrains setting folder
 .idea/
+
+# VS Code
+.vscode/
+
+# CMS uploaded media (may contain client data)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# CMS messages (contact form submissions, contains personal data)
+src/content/messages/*
+!src/content/messages/.gitkeep
