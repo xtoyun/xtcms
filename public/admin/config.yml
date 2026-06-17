@@ -16,8 +16,16 @@ collections:
     folder: src/content/posts
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
     editor:
       preview: false
+    view_groups:
+      - label: 📌 置顶文章
+        field: pinned
+        pattern: true
+      - label: 文章列表
+        field: pinned
+        pattern: false
     fields:
       - { label: 标题, name: title, widget: string }
       - { label: 描述, name: description, widget: text, required: false }
@@ -34,8 +42,16 @@ collections:
     folder: src/content/projects
     create: true
     slug: "{{slug}}"
+    summary: "{{pinned | ternary('📌 ', '')}}{{title}} — {{category}}"
     editor:
       preview: false
+    view_groups:
+      - label: 📌 置顶项目
+        field: pinned
+        pattern: true
+      - label: 项目列表
+        field: pinned
+        pattern: false
     fields:
       - { label: 项目名称, name: title, widget: string }
       - { label: 描述, name: description, widget: text }
