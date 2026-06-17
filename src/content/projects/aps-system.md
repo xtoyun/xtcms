@@ -10,4 +10,4 @@ pinned: true
 link: ''
 ---
 
-# APS智能排产系统
+aps-system
