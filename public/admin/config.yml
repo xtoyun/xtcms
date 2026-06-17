@@ -47,7 +47,7 @@ collections:
     label_singular: 项目
     folder: src/content/projects
     create: true
-    slug: "{{slug}}"
+    slug: "{{fields._slug}}"
     summary: "{{title}} — {{category}}"
     editor:
       preview: false

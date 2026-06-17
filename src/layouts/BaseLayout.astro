@@ -6,6 +6,7 @@ export interface Props { title?: string; description?: string; }
 
 const { title, description } = Astro.props;
 const siteTitle = title ? `${title} - 雄韬官网` : '雄韬官网 - 网络营销品牌';
+const currentPath = Astro.url.pathname;
 const navItems = [
   { label: '首页', href: '/' },
   { label: '项目', href: '/projects' },
@@ -13,7 +14,10 @@ const navItems = [
   { label: '文章', href: '/posts' },
   { label: '关于', href: '/about' },
   { label: '联系', href: '/contact' },
-];
+].map(item => ({
+  ...item,
+  active: item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href),
+}));
 ---
 
 <!DOCTYPE html>
@@ -29,8 +33,8 @@ const navItems = [
     .sidebar { position:fixed;left:0;top:0;width:300px;height:100vh;background:#fff;display:flex;flex-direction:column;padding:50px 40px;z-index:40; }
     .sidebar-logo { width:80px;height:auto;display:block;margin-bottom:64px; }
     .sidebar nav { flex:1;display:flex;flex-direction:column;gap:8px; }
-    .sidebar nav a { font-size:18px;font-weight:400;color:#000;text-decoration:none;padding:6px 0;transition:opacity .2s; }
-    .sidebar nav a:hover { opacity:.6; }
+    .sidebar nav a { font-size:18px;font-weight:400;color:#000;text-decoration:none;padding:6px 0;opacity:.45;transition:opacity .2s; }
+    .sidebar nav a:hover { opacity:.8; }
     .sidebar-foot { border-top:1px solid #eee;padding-top:20px;font-size:15px;color:#7C7F83; }
     .sidebar-foot .sf-row { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
     .sidebar-foot a { color:#7C7F83;text-decoration:none; }
@@ -57,7 +61,8 @@ const navItems = [
     .mob-menu-close { align-self:flex-end;background:none;border:none;font-size:28px;cursor:pointer;color:#000;padding:4px 8px; }
     .mob-menu-logo { font-size:18px;font-weight:600;color:#000;text-decoration:none;margin-bottom:24px; }
     .mob-menu nav { display:flex;flex-direction:column;gap:4px; }
-    .mob-menu nav a { display:block;padding:12px 0;font-size:17px;color:#000;text-decoration:none;border-bottom:1px solid #f0f0f0; }
+    .mob-menu nav a { display:block;padding:12px 0;font-size:17px;color:#000;text-decoration:none;border-bottom:1px solid #f0f0f0;opacity:.45; }
+    .mob-menu nav a.active-mob { opacity:1;font-weight:600; }
     .mob-menu-foot { margin-top:auto;padding-top:20px;border-top:1px solid #eee;font-size:15px;color:#7C7F83;line-height:2; }
 
     /* Smaller buttons */
@@ -79,7 +84,9 @@ const navItems = [
   <aside class="sidebar">
     <a href="/"><img src="/logo.png" alt="雄韬网络" class="sidebar-logo" /></a>
     <nav>
-      {navItems.map(item => (<a href={item.href}>{item.label}</a>))}
+      {navItems.map(item => (
+        <a href={item.href} style={item.active ? 'opacity:1;font-weight:600' : ''}>{item.label}</a>
+      ))}
     </nav>
     <div class="sidebar-foot">
       <div class="sf-row">
@@ -106,7 +113,9 @@ const navItems = [
     <button class="mob-menu-close" id="mob-close">&times;</button>
     <a href="/" class="mob-menu-logo">雄韬智网</a>
     <nav>
-      {navItems.map(item => (<a href={item.href}>{item.label}</a>))}
+      {navItems.map(item => (
+        <a href={item.href} style={item.active ? 'opacity:1;font-weight:600' : ''}>{item.label}</a>
+      ))}
     </nav>
     <div class="mob-menu-foot">
       <p>📧 xc@xtocn.com</p>
