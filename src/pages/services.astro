@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const services = await getCollection('services');
+---
+
+<BaseLayout title="服务项目">
+  <section style="padding:80px 0">
+    <div style="max-width:1200px;margin:0 auto;padding:0 40px">
+      <h1 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.3em">服务<span style="font-weight:300">项目</span></h1>
+      <p style="font-size:16px;color:#7C7F83;margin-bottom:50px">六大核心服务，覆盖网络营销全链路</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:30px">
+        {services.sort((a,b)=> (a.data.order||0) - (b.data.order||0)).map(s => (
+          <div style="border:1px solid #eee;padding:40px 30px;transition:border-color 0.3s">
+            <div style="font-size:32px;margin-bottom:20px">{s.data.icon}</div>
+            <h3 style="font-size:22px;font-weight:400;color:#000;margin-bottom:12px">{s.data.title}</h3>
+            <p style="font-size:15px;color:#7C7F83;line-height:1.8;margin-bottom:20px">{s.data.description}</p>
+            {s.body && (
+              <div style="font-size:14px;color:#7C7F83;line-height:1.8;border-top:1px solid #eee;padding-top:20px" set:html={s.body} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {services.length === 0 && (
+        <div style="text-align:center;padding:80px 0;color:#7C7F83">服务项目即将更新</div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

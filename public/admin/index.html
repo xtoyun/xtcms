@@ -1,16 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>内容管理 - 雄韬网络</title>
-  <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
+  <title>雄韬官网</title>
+  <link href="/admin/config.yml" type="application/yaml" rel="cms-config-url">
 </head>
 <body>
-  <div id="nc-root"></div>
   <script>
-    // Decap CMS will mount here
-    if (window.initCMS) window.initCMS();
+    // Polyfill for crypto.randomUUID() on older browsers or non-secure contexts
+    if (!globalThis.crypto?.randomUUID) {
+      globalThis.crypto.randomUUID = function() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+    }
+  </script>
+  <script src="/admin/sveltia-cms.js"></script>
+  <script>
+    setInterval(() => { if (document.title !== '雄韬官网') document.title = '雄韬官网'; }, 500);
   </script>
 </body>
 </html>

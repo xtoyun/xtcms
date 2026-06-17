@@ -1,37 +1,113 @@
 backend:
-  name: git-gateway
-  branch: main
-  repo: xtocn/xtocn-website
+  name: server-api
 
-media_folder: "public/uploads"
-public_folder: "/uploads"
+media_folder: public/uploads
+public_folder: /uploads
+
+site_url: https://www.xtocn.com
+logo:
+  src: /logo.png
+app_title: 雄韬官网
 
 collections:
-  - name: "posts"
-    label: "文章"
-    folder: "src/content/posts"
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    folder: src/content/posts
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: false
     fields:
-      - { label: "标题", name: "title", widget: "string" }
-      - { label: "描述", name: "description", widget: "text", required: false }
-      - { label: "发布日期", name: "date", widget: "datetime" }
-      - { label: "标签", name: "tags", widget: "list", required: false }
-      - { label: "封面图", name: "image", widget: "image", required: false }
-      - { label: "草稿", name: "draft", widget: "boolean", default: false }
-      - { label: "正文", name: "body", widget: "markdown" }
+      - { label: 标题, name: title, widget: string }
+      - { label: 描述, name: description, widget: text, required: false }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { label: 标签, name: tags, widget: list, required: false, default: [] }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 草稿, name: draft, widget: boolean, default: false }
+      - { label: 正文, name: body, widget: markdown }
 
-  - name: "projects"
-    label: "项目案例"
-    folder: "src/content/projects"
+  - name: projects
+    label: 项目案例
+    label_singular: 项目
+    folder: src/content/projects
     create: true
     slug: "{{slug}}"
+    editor:
+      preview: false
     fields:
-      - { label: "项目名称", name: "title", widget: "string" }
-      - { label: "描述", name: "description", widget: "text" }
-      - { label: "分类", name: "category", widget: "select", options: ["品牌建设", "网站建设", "网络营销", "自媒体", "数字化管理"] }
-      - { label: "客户", name: "client", widget: "string", required: false }
-      - { label: "日期", name: "date", widget: "datetime", required: false }
-      - { label: "封面图", name: "image", widget: "image", required: false }
-      - { label: "精选项目", name: "featured", widget: "boolean", default: false }
-      - { label: "链接", name: "link", widget: "string", required: false }
+      - { label: 项目名称, name: title, widget: string }
+      - { label: 描述, name: description, widget: text }
+      - { label: 分类, name: category, widget: select, options: ["品牌建设", "网站建设", "网络营销", "自媒体", "数字化管理"] }
+      - { label: 客户, name: client, widget: string, required: false }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 精选项目, name: featured, widget: boolean, default: false }
+      - { label: 链接, name: link, widget: string, required: false }
+      - { label: 正文, name: body, widget: markdown, required: false }
+
+  - name: services
+    label: 服务项目
+    label_singular: 服务
+    folder: src/content/services
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: 服务名称, name: title, widget: string }
+      - { label: 图标(emoji), name: icon, widget: string }
+      - { label: 描述, name: description, widget: text }
+      - { label: 排序, name: order, widget: number, default: 0, value_type: int }
+      - { label: 详情, name: body, widget: markdown, required: false }
+
+  - name: pages
+    label: 页面管理
+    label_singular: 页面
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: 页面标题, name: title, widget: string }
+      - { label: 正文, name: body, widget: markdown }
+
+  - name: messages
+    label: 留言管理
+    label_singular: 留言
+    folder: src/content/messages
+    create: false
+    editor:
+      preview: false
+    fields:
+      - { label: 姓名, name: name, widget: string }
+      - { label: 公司, name: company, widget: string, required: false }
+      - { label: 电话, name: phone, widget: string }
+      - { label: 邮箱, name: email, widget: string, required: false }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, time_format: false }
+      - { label: 已读, name: read, widget: boolean, default: false }
+      - { label: 留言内容, name: body, widget: markdown }
+
+  - name: settings
+    label: 站点设置
+    files:
+      - name: general
+        label: 基本信息
+        file: src/content/settings/general.yml
+        fields:
+          - { label: 网站标题, name: site_title, widget: string }
+          - { label: 网站描述, name: site_description, widget: text }
+          - { label: ICP备案号, name: icp, widget: string, required: false }
+          - { label: 公安备案号, name: police, widget: string, required: false }
+          - { label: 联系邮箱, name: email, widget: string, required: false }
+          - { label: 联系电话, name: phone, widget: string, required: false }
+      - name: footer
+        label: 页脚设置
+        file: src/content/settings/footer.yml
+        fields:
+          - { label: ICP备案号, name: icp, widget: string }
+          - { label: 公安备案号, name: police, widget: string, required: false }
+          - { label: 版权文字, name: copyright, widget: string }
+          - { label: 联系邮箱, name: email, widget: string }
+          - { label: 联系电话, name: phone, widget: string }

@@ -4,122 +4,136 @@ import { getCollection } from 'astro:content';
 
 const featuredProjects = (await getCollection('projects'))
   .filter(p => p.data.featured)
-  .slice(0, 6);
-
-const services = [
-  { icon: '🎯', title: '品牌建设', desc: '从品牌策略到视觉设计，打造差异化网络品牌形象' },
-  { icon: '🌐', title: '网站建设', desc: '营销型网站开发，PC+移动+小程序全终端覆盖' },
-  { icon: '📈', title: '搜索引擎优化', desc: '百度/Google SEO优化，提升搜索排名与自然流量' },
-  { icon: '📱', title: '社交媒体营销', desc: '微信、抖音、视频号等社交媒体内容策划与运营' },
-  { icon: '📊', title: '数据分析与策略', desc: '数据驱动的营销策略，精准投放与效果追踪' },
-  { icon: '🤖', title: '数字化管理', desc: '企业数字化工具选型、CRM/ERP系统建设咨询' },
-];
+  .slice(0, 3);
 ---
 
 <BaseLayout>
-  <!-- Hero - matching original light hero with large text -->
-  <section class="relative bg-white py-20 md:py-28">
+  <!-- ===== Hero - centered text, no image ===== -->
+  <section class="py-20 md:py-32 text-center">
     <div class="container-main">
-      <div class="max-w-3xl">
-        <p class="text-brand-blue font-semibold mb-4 text-sm tracking-wide">创建于 2013 · 网络营销品牌</p>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-6">
-          打造网络品牌<br />
-          自媒体品牌<br />
-          互联网营销
-        </h1>
-        <p class="text-xl text-gray-500 mb-8">
-          Hello! 我们是雄韬网络
-        </p>
-        <p class="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-          15年互联网营销品牌，用最新的技术和趋势，为您的企业提供现代设计与开发。
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 mb-12">
-          <a href="/contact" class="btn btn-primary text-lg">联系我们</a>
-          <a href="/#projects" class="btn btn-outline text-lg">查看案例</a>
-        </div>
+      <h1 style="font-size:50px;font-weight:400;line-height:1.2;color:#000">
+        打造网络品牌
+        <span id="rotating-text" style="display:inline-block;vertical-align:bottom;overflow:hidden;height:60px;width:250px;position:relative">
+          <span id="rotating-inner" style="position:absolute;left:0;top:0;width:100%;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1)">
+            <span class="rotate-line" style="display:block;height:60px;line-height:60px">自媒体品牌</span>
+            <span class="rotate-line" style="display:block;height:60px;line-height:60px">互联网营销</span>
+          </span>
+        </span>
+      </h1>
+      <p style="font-size:22px;font-weight:300;color:#7C7F83;margin-top:0.3em;margin-bottom:0.2em">把生意服务到全世界</p>
+      <p style="font-size:18px;font-weight:400;color:#000;letter-spacing:3px">网络营销品牌</p>
+    </div>
+  </section>
 
-        <!-- Stats counters -->
-        <div class="flex gap-12 pt-8 border-t border-gray-100">
-          <div>
-            <div class="text-4xl font-bold text-gray-900">15<span class="text-brand-blue text-xl">+</span></div>
-            <div class="text-sm text-gray-500 mt-1">年行业经验</div>
-          </div>
-          <div>
-            <div class="text-4xl font-bold text-gray-900">500<span class="text-brand-blue text-xl">+</span></div>
-            <div class="text-sm text-gray-500 mt-1">服务企业</div>
-          </div>
-        </div>
+  <script is:inline>
+    (function(){
+      const inner = document.getElementById('rotating-inner');
+      if(!inner) return;
+      const items = inner.querySelectorAll('.rotate-line');
+      const total = items.length;
+      let current = 0;
+      const h = 60;
+      setInterval(()=>{
+        current = (current+1)%total;
+        inner.style.transform = 'translateY(-'+ (current*h) +'px)';
+      }, 2500);
+    })();
+  </script>
+
+  <!-- ===== Section 3: 关于 - image left, text right ===== -->
+  <section style="padding:80px 0;display:flex;align-items:center;min-height:60vh">
+    <div style="flex:1;padding-right:40px">
+      <img src="/art-home-05.jpeg" alt="雄韬网络" style="width:100%;height:auto;display:block" />
+    </div>
+    <div style="flex:1;padding-left:20px">
+      <h2 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.8em">Hello! 我们是雄韬网络.</h2>
+      <p style="font-size:18px;font-weight:300;color:#7C7F83;line-height:1.8;margin-bottom:2em">
+        15年互联网营销品牌，用最新的技术和趋势，为您的企业提供现代设计与开发，把生意服务到全世界。
+      </p>
+      <div class="flex gap-4 mb-10">
+        <a href="/posts" class="btn-the7">案例</a>
+        <a href="/about" class="btn-the7">关于</a>
+      </div>
+      <div class="flex gap-12">
+        <div><div style="font-size:44px;font-weight:400;color:#000;line-height:1.7">15<span style="font-size:24px">+</span></div><div style="font-size:14px;color:#7C7F83">年行业经验</div></div>
+        <div><div style="font-size:44px;font-weight:400;color:#000;line-height:1.7">500<span style="font-size:24px">+</span></div><div style="font-size:14px;color:#7C7F83">服务企业</div></div>
       </div>
     </div>
   </section>
 
-  <!-- Projects - masonry-style grid matching original portfolio -->
-  <section id="projects" class="section-padding bg-gray-50">
+  <!-- ===== Section 4: 项目作品集 - 3 column grid ===== -->
+  <section class="py-16">
     <div class="container-main">
-      <h2 class="section-title">精选<span class="text-brand-blue">案例</span></h2>
-      <p class="section-subtitle">为您的企业提供数字解决方案</p>
+      <h2 class="text-center" style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.3em">精选<span style="font-weight:300">案例</span></h2>
+      <p class="text-center" style="color:#7C7F83;margin-bottom:3em">为您的企业提供数字解决方案</p>
+
       {
         featuredProjects.length > 0 ? (
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProjects.map(project => (
-              <a href={project.data.link || '#'} class="group block bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-lg transition-all">
-                <div class="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm">
+              <a href={`/projects/${project.id}`} class="group block no-underline">
+                <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden mb-4">
                   {project.data.image ? (
                     <img src={project.data.image} alt={project.data.title} class="w-full h-full object-cover" />
                   ) : (
-                    <span>{project.data.title}</span>
+                    <span class="text-sm text-gray-400">{project.data.title}</span>
                   )}
                 </div>
-                <div class="p-4">
-                  <span class="text-xs text-brand-blue font-medium">{project.data.category}</span>
-                  <h3 class="text-gray-900 font-bold mt-1 group-hover:text-brand-blue transition-colors">{project.data.title}</h3>
-                  <p class="text-sm text-gray-500 mt-1">{project.data.description}</p>
-                </div>
+                <span style="font-size:13px;color:#7C7F83">{project.data.category}</span>
+                <h5 class="mt-1 group-hover:opacity-70 transition-opacity" style="color:#000">{project.data.title}</h5>
               </a>
             ))}
           </div>
         ) : (
-          <div class="text-center text-gray-400 py-12">
-            <p class="text-lg">项目案例即将上线</p>
-            <p class="text-sm mt-2">精彩项目正在整理中，敬请期待</p>
-          </div>
+          <div class="text-center py-12" style="color:#7C7F83">项目案例即将上线</div>
         )
       }
     </div>
   </section>
 
-  <!-- CTA Banner -->
-  <section class="py-16 bg-brand-blue text-white text-center">
-    <div class="container-main max-w-2xl">
-      <h2 class="text-3xl font-bold text-white mb-4">为您的企业提供数字解决方案</h2>
-      <p class="text-white/80 mb-8">把生意服务到全世界</p>
-      <a href="/contact" class="btn bg-white !text-brand-blue hover:!bg-gray-100 text-lg">马上联系</a>
-    </div>
-  </section>
-
-  <!-- Services -->
-  <section id="services" class="section-padding bg-white">
+  <!-- ===== Section 5: 数字解决方案 CTA - left/right split ===== -->
+  <section class="py-16">
     <div class="container-main">
-      <h2 class="section-title">我们擅长<span class="text-brand-blue">什么</span>？</h2>
-      <p class="section-subtitle">6大核心服务，覆盖网络营销全链路</p>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map(s => (
-          <div class="card-light group">
-            <div class="text-3xl mb-4">{s.icon}</div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
-            <p class="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
-          </div>
-        ))}
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.5em">为您的企业提供数字<span style="font-weight:300">解决方案</span></h2>
+          <p style="font-size:18px;font-weight:300;color:#7C7F83;line-height:1.8;margin-bottom:2em">把生意服务到全世界</p>
+          <a href="/contact" class="btn-the7 btn-the7-lg">联系我们</a>
+        </div>
+        <div>
+          <ol style="list-style:decimal;padding-left:1.5em;font-size:16px;color:#7C7F83;line-height:2.5">
+            <li>网络广告</li>
+            <li>搜索引擎优化(SEO)</li>
+            <li>社交媒体营销</li>
+            <li>内容营销</li>
+            <li>数据分析和营销策略</li>
+          </ol>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Contact CTA -->
-  <section class="section-padding bg-gray-50 text-center">
-    <div class="container-main max-w-2xl">
-      <h2 class="text-3xl font-bold text-gray-900 mb-4">请告诉您的<span class="text-brand-blue">需求</span>！</h2>
-      <p class="text-gray-500 mb-8">我们为你提供更好服务</p>
-      <a href="/contact" class="btn btn-primary text-lg">联系我们</a>
+  <!-- ===== Section 6: 服务图标卡片 - 6 column grid ===== -->
+  <section class="py-16">
+    <div class="container-main">
+      <h2 class="text-center" style="font-size:34px;font-weight:400;color:#000;margin-bottom:2em">我们擅长<span style="font-weight:300">什么</span>？</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+        <div class="p-4"><div class="text-2xl mb-2">🌐</div><div style="font-size:14px;font-weight:600;color:#000">营销型网站建设</div></div>
+        <div class="p-4"><div class="text-2xl mb-2">📊</div><div style="font-size:14px;font-weight:600;color:#000">数字化营销</div></div>
+        <div class="p-4"><div class="text-2xl mb-2">🎯</div><div style="font-size:14px;font-weight:600;color:#000">网络品牌</div></div>
+        <div class="p-4"><div class="text-2xl mb-2">📈</div><div style="font-size:14px;font-weight:600;color:#000">网络优化</div></div>
+        <div class="p-4"><div class="text-2xl mb-2">📝</div><div style="font-size:14px;font-weight:600;color:#000">内容营销</div></div>
+        <div class="p-4"><div class="text-2xl mb-2">📋</div><div style="font-size:14px;font-weight:600;color:#000">数据分析</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Section 7: CTA - centered ===== -->
+  <section class="py-16 text-center">
+    <div class="container-main max-w-xl">
+      <h2 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.5em">请告诉您的<span style="font-weight:300">需求</span>！</h2>
+      <p style="font-size:18px;font-weight:300;color:#7C7F83;margin-bottom:2em">我们为你提供更好服务</p>
+      <a href="/contact" class="btn-the7 btn-the7-lg">马上联系</a>
     </div>
   </section>
 </BaseLayout>

@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+
+const { slug } = Astro.params;
+const projects = await getCollection('projects');
+const project = projects.find(p => p.id === slug);
+
+if (!project) {
+  return Astro.redirect('/');
+}
+
+const htmlBody = project.body ? marked.parse(project.body) : '';
+---
+
+<BaseLayout title={project.data.title}>
+  <section style="padding:80px 0">
+    <div style="max-width:900px;margin:0 auto;padding:0 40px">
+      <a href="/" style="font-size:14px;color:#7C7F83;text-decoration:none">← 返回首页</a>
+
+      <div style="margin-top:40px">
+        {project.data.image && (
+          <img src={project.data.image} alt={project.data.title} style="width:100%;max-height:500px;object-fit:cover;margin-bottom:40px" />
+        )}
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px">
+          <span style="font-size:13px;color:#fff;background:#000;padding:2px 10px;border-radius:2px">{project.data.category}</span>
+          {project.data.date && <span style="font-size:13px;color:#7C7F83">{String(project.data.date).slice(0,10)}</span>}
+        </div>
+
+        <h1 style="font-size:34px;font-weight:400;color:#000;margin-bottom:20px">{project.data.title}</h1>
+        <p style="font-size:18px;font-weight:300;color:#7C7F83;line-height:1.8;margin-bottom:40px">{project.data.description}</p>
+
+        {htmlBody && (
+          <div class="cms-content" style="font-size:16px;line-height:1.9;color:#333" set:html={htmlBody} />
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

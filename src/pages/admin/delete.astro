@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+import fs from 'node:fs';
+import path from 'node:path';
+
+const url = new URL(Astro.request.url);
+const type = url.searchParams.get('type') || 'posts';
+const slug = url.searchParams.get('slug') || '';
+
+const folders: Record<string, string> = { posts: 'src/content/posts', projects: 'src/content/projects', services: 'src/content/services', pages: 'src/content/pages', messages: 'src/content/messages' };
+const folder = folders[type];
+if (folder) { const fp = path.join(process.cwd(), folder, `${slug}.md`); if (fs.existsSync(fp)) fs.unlinkSync(fp); }
+return Astro.redirect(`/admin?type=${type}`);

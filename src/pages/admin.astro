@@ -1,0 +1,99 @@
+---
+export const prerender = false;
+import fs from 'node:fs';
+import path from 'node:path';
+
+const url = new URL(Astro.request.url);
+const type = url.searchParams.get('type') || 'posts';
+
+const folders: Record<string, { path: string; label: string }> = {
+  posts: { path: 'src/content/posts', label: '文章' },
+  projects: { path: 'src/content/projects', label: '项目' },
+  services: { path: 'src/content/services', label: '服务' },
+  pages: { path: 'src/content/pages', label: '页面' },
+  messages: { path: 'src/content/messages', label: '留言' },
+};
+
+const current = folders[type] || folders.posts;
+const dir = path.join(process.cwd(), current.path);
+const items: { slug: string; title: string; date: string }[] = [];
+
+if (fs.existsSync(dir)) {
+  for (const f of fs.readdirSync(dir)) {
+    if (!f.endsWith('.md') && !f.endsWith('.yml')) continue;
+    const raw = fs.readFileSync(path.join(dir, f), 'utf8');
+    const fm = raw.match(/^---\n([\s\S]*?)\n---/);
+    let title = f.replace(/\.(md|yml)$/, '');
+    let date = '';
+    if (fm) {
+      for (const line of fm[1].split('\n')) {
+        const m = line.match(/^(\w+):\s*["']?(.*)["']?$/);
+        if (m?.[1] === 'title') title = m[2];
+        if (m?.[1] === 'date') date = m[2]?.slice(0, 10);
+      }
+    }
+    items.push({ slug: f.replace(/\.(md|yml)$/, ''), title, date });
+  }
+}
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>后台 - 雄韬官网</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Nunito",sans-serif;background:#f5f5f5;display:flex;min-height:100vh}
+.side{width:200px;background:#fff;padding:30px 20px;border-right:1px solid #e5e5e5}
+.side h3{font-size:16px;color:#000;margin-bottom:20px}
+.side a{display:block;padding:8px 12px;font-size:14px;color:#333;text-decoration:none;border-radius:4px;margin-bottom:4px}
+.side a:hover,.side a.on{background:#f0f0f0}
+.main{flex:1;padding:30px 40px;max-width:1000px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.top h1{font-size:22px;font-weight:400;color:#000}
+.btn{display:inline-flex;align-items:center;padding:8px 18px;border:none;border-radius:4px;font-size:13px;font-family:"Nunito",sans-serif;cursor:pointer;text-decoration:none}
+.btn1{background:#000;color:#fff}.btn1:hover{opacity:0.85}
+.btn2{background:#c00;color:#fff}.btn2:hover{opacity:0.85}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:4px;overflow:hidden;border:1px solid #e5e5e5}
+th,td{text-align:left;padding:10px 16px;border-bottom:1px solid #eee;font-size:13px}
+th{background:#f8f8f8;font-weight:600;color:#333}
+td{color:#555}.gap{display:flex;gap:6px}.empty{padding:80px;text-align:center;color:#999;background:#fff;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="side">
+  <h3>内容管理</h3>
+  {Object.entries(folders).map(([k,v]) => <a href={`/admin?type=${k}`} class={type===k?'on':''}>{v.label}</a>)}
+  <a href="/" style="margin-top:20px;color:#999;display:block;padding:8px 12px;text-decoration:none;font-size:14px">← 回首页</a>
+</div>
+
+<div class="main">
+  <div class="top">
+    <h1>{current.label}</h1>
+    {type !== 'messages' && <a href={`/admin/edit?type=${type}`} class="btn btn1">+ 新建</a>}
+  </div>
+
+  {items.length === 0 ? <div class="empty">暂无{current.label}</div> : (
+    <table>
+      <thead><tr><th>标题</th><th>日期</th><th>操作</th></tr></thead>
+      <tbody>
+        {items.map(f => (
+          <tr>
+            <td style="font-weight:500;color:#000">{f.title || f.slug}</td>
+            <td style="color:#999">{f.date || '-'}</td>
+            <td class="gap">
+              <a href={`/admin/edit?type=${type}&slug=${f.slug}`} class="btn btn1" style="font-size:12px;padding:4px 10px">编辑</a>
+              {type !== 'messages' && (
+                <form method="POST" action={`/admin/delete?type=${type}&slug=${f.slug}`} style="display:inline" onsubmit="return confirm('确定删除?')">
+                  <button class="btn btn2" style="font-size:12px;padding:4px 10px">删除</button>
+                </form>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
+</body>
+</html>

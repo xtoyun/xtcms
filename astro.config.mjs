@@ -1,14 +1,16 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import node from '@astrojs/node';
 
-// https://astro.build/config
 export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()]
-  },
+  devToolbar: { enabled: false },
+  output: 'server',
+  security: { checkOrigin: false },
+  vite: { plugins: [tailwindcss()] },
+  cacheDir: './node_modules/.astro-cache',
   site: 'https://www.xtocn.com',
-  build: {
-    assets: 'assets'
-  }
+  build: { assets: 'assets' },
+  server: { host: '0.0.0.0', port: 4321 },
+  adapter: node({ mode: 'standalone' }),
 });

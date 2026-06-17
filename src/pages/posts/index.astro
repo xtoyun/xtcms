@@ -8,38 +8,42 @@ const posts = (await getCollection('posts'))
 ---
 
 <BaseLayout title="文章">
-  <section class="py-20">
-    <div class="container-main max-w-3xl">
-      <h1 class="text-4xl font-bold text-white mb-4"><span class="text-brand-gold">文章</span></h1>
-      <p class="text-gray-400 mb-12">互联网营销 · 品牌建设 · 数字化转型</p>
+  <section style="padding:80px 0">
+    <div style="max-width:1200px;margin:0 auto;padding:0 40px">
+      <h1 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.3em">文章</h1>
+      <p style="font-size:16px;color:#7C7F83;margin-bottom:50px">互联网营销 · 品牌建设 · 数字化转型</p>
 
       {
         posts.length > 0 ? (
-          <div class="space-y-8">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:30px">
             {posts.map(post => (
-              <article class="card group">
-                <a href={`/posts/${post.id}`} class="block">
-                  <time class="text-xs text-gray-600">{post.data.date.toLocaleDateString('zh-CN')}</time>
-                  <h2 class="text-xl font-bold text-white group-hover:text-brand-gold transition-colors mt-2 mb-2">
-                    {post.data.title}
-                  </h2>
-                  {post.data.description && <p class="text-gray-500 text-sm">{post.data.description}</p>}
-                  {post.data.tags && (
-                    <div class="flex gap-2 mt-3">
-                      {post.data.tags.map(tag => (
-                        <span class="text-xs px-2 py-0.5 rounded bg-white/5 text-gray-500">{tag}</span>
-                      ))}
+              <a href={`/posts/${post.id}`} style="text-decoration:none;color:inherit;display:block">
+                <article style="border:1px solid #eee;transition:border-color 0.3s;overflow:hidden">
+                  {post.data.image ? (
+                    <div style="aspect-ratio:16/9;overflow:hidden;background:#f5f5f5">
+                      <img src={post.data.image} alt={post.data.title} style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s" />
                     </div>
+                  ) : (
+                    <div style="aspect-ratio:16/9;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#ddd;font-size:13px">雄韬网络</div>
                   )}
-                </a>
-              </article>
+                  <div style="padding:30px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                      <time style="font-size:12px;color:#aaa">{post.data.date.toLocaleDateString('zh-CN')}</time>
+                      {post.data.tags && post.data.tags.length > 0 && (
+                        <span style="font-size:11px;color:#7C7F83;background:#f5f5f5;padding:2px 8px;border-radius:2px">{post.data.tags[0]}</span>
+                      )}
+                    </div>
+                    <h2 style="font-size:20px;font-weight:400;color:#000;line-height:1.4;margin:0 0 10px 0">{post.data.title}</h2>
+                    {post.data.description && (
+                      <p style="font-size:14px;color:#7C7F83;line-height:1.7;margin:0">{post.data.description}</p>
+                    )}
+                  </div>
+                </article>
+              </a>
             ))}
           </div>
         ) : (
-          <div class="text-center text-gray-600 py-20">
-            <p class="text-lg">还没有文章</p>
-            <p class="text-sm mt-2">精彩内容即将上线</p>
-          </div>
+          <div style="text-align:center;padding:80px 0;color:#7C7F83">精彩内容即将上线</div>
         )
       }
     </div>

@@ -1,0 +1,96 @@
+---
+export const prerender = false;
+import fs from 'node:fs';
+import path from 'node:path';
+
+const url = new URL(Astro.request.url);
+const type = url.searchParams.get('type') || 'posts';
+const slug = url.searchParams.get('slug') || '';
+
+const folders: Record<string, string> = { posts: 'src/content/posts', projects: 'src/content/projects', services: 'src/content/services', pages: 'src/content/pages' };
+const folder = folders[type];
+if (!folder) return new Response('Invalid type', { status: 400 });
+
+const filePath = path.join(process.cwd(), folder, `${slug}.md`);
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  const title = data.get('title')?.toString() || '';
+  const markdown = data.get('markdown')?.toString() || '';
+  const lines = [`title: ${title}`];
+  for (const [k, v] of data.entries()) {
+    if (!['title', 'markdown'].includes(k)) lines.push(`${k}: ${v.toString()}`);
+  }
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, `---\n${lines.join('\n')}\n---\n${markdown}`, 'utf8');
+  return Astro.redirect(`/admin?type=${type}`);
+}
+
+let title = '', body = '', extra: Record<string,string> = {};
+if (slug && fs.existsSync(filePath)) {
+  const raw = fs.readFileSync(filePath, 'utf8');
+  const fm = raw.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (fm) {
+    for (const line of fm[1].split('\n')) {
+      const m = line.match(/^(\w+):\s*["']?(.*)["']?$/);
+      if (m && m[1] === 'title') title = m[2];
+      else if (m && !['body'].includes(m[1])) extra[m[1]] = m[2];
+    }
+  }
+  body = raw.replace(/^---\n[\s\S]*?\n---\n?/, '');
+}
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{slug ? '编辑' : '新建'} - 雄韬官网</title>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Nunito",sans-serif;background:#fff}
+.main{max-width:900px;margin:0 auto;padding:30px 40px}
+.main h1{font-size:22px;font-weight:400;color:#000;margin-bottom:24px}
+.row{margin-bottom:14px}
+.row label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+.row input[type=text]{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:"Nunito",sans-serif}
+.btns{display:flex;gap:8px;margin-top:20px}
+.btn{padding:8px 20px;border:none;border-radius:4px;font-size:14px;font-family:"Nunito",sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn-primary{background:#000;color:#fff}.btn-primary:hover{opacity:0.85}
+.btn-back{color:#666;background:#f0f0f0}
+</style>
+</head>
+<body>
+<div class="main">
+  <h1>{slug ? `编辑: ${title}` : '新建'}</h1>
+  <form method="POST" id="editor-form">
+    <div class="row"><label>标题</label><input type="text" name="title" value={title} required /></div>
+    {Object.entries(extra).map(([k,v]) => (
+      <div class="row"><label>{k}</label><input type="text" name={k} value={v} /></div>
+    ))}
+    {!slug && <input type="hidden" name="date" value={new Date().toISOString().slice(0,10)} />}
+    <div class="row"><label>正文</label><div id="editor"></div></div>
+    <input type="hidden" name="markdown" id="markdown-input" value={body.replace(/`/g, '\\`').replace(/"/g, '&quot;')} />
+    <div class="btns"><button type="submit" class="btn btn-primary">保存</button><a href={`/admin?type=${type}`} class="btn btn-back">取消</a></div>
+  </form>
+</div>
+
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+  const Editor = toastui.Editor;
+  const editor = new Editor({
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'tab',
+    initialValue: `{body}`,
+    language: 'zh-CN',
+  });
+
+  document.getElementById('editor-form').addEventListener('submit', function() {
+    document.getElementById('markdown-input').value = editor.getMarkdown();
+  });
+</script>
+</body>
+</html>
