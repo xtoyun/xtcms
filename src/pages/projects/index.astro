@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getContent } from '../../lib/content';
 
-const allProjects = await getCollection('projects');
+const allProjects = getContent('src/content/projects');
 
 const categories = [...new Set(allProjects.map(p => p.data.category))];
 ---
@@ -30,8 +30,9 @@ const categories = [...new Set(allProjects.map(p => p.data.category))];
                 </div>
                 <!-- Info -->
                 <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                  {project.data.pinned && <span style="font-size:11px;color:#d4380d;background:#fff2e8;border:1px solid #ffbb96;padding:1px 8px;border-radius:2px;font-weight:500">置顶</span>}
                   <span style="font-size:11px;color:#fff;background:#000;padding:2px 8px;border-radius:2px">{project.data.category}</span>
-                  {project.data.date && <span style="font-size:12px;color:#aaa">{project.data.date.toString().slice(0,10)}</span>}
+                  {project.data.date && <span style="font-size:12px;color:#aaa">{String(project.data.date).slice(0,10)}</span>}
                 </div>
                 <h3 style="font-size:18px;font-weight:400;color:#000;margin:0 0 8px 0;line-height:1.4">{project.data.title}</h3>
                 <p style="font-size:14px;color:#7C7F83;margin:0;line-height:1.6">{project.data.description}</p>

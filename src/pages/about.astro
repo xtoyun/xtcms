@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getContent } from '../lib/content';
 import { marked } from 'marked';
 
-const pages = await getCollection('pages');
+const pages = getContent('src/content/pages');
 const aboutPage = pages.find(p => p.id === 'about');
 const htmlContent = aboutPage?.body ? marked.parse(aboutPage.body) : '';
 const title = aboutPage?.data.title || '关于雄韬网络';

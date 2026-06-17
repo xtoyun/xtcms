@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getContent } from '../lib/content';
 
-const featuredProjects = (await getCollection('projects'))
+const featuredProjects = getContent('src/content/projects')
   .filter(p => p.data.featured)
   .slice(0, 3);
 ---

@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getContent } from '../lib/content';
 
-const services = await getCollection('services');
+const services = getContent('src/content/services');
 ---
 
 <BaseLayout title="服务项目">

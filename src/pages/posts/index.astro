@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getContent } from '../../lib/content';
 
-const posts = (await getCollection('posts'))
-  .filter(p => !p.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const posts = getContent('src/content/posts')
+  .filter(p => !p.data.draft);
 ---
 
 <BaseLayout title="文章">
@@ -28,8 +27,9 @@ const posts = (await getCollection('posts'))
                   )}
                   <div style="padding:30px">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-                      <time style="font-size:12px;color:#aaa">{post.data.date.toLocaleDateString('zh-CN')}</time>
-                      {post.data.tags && post.data.tags.length > 0 && (
+                      {post.data.pinned && <span style="font-size:11px;color:#d4380d;background:#fff2e8;border:1px solid #ffbb96;padding:1px 8px;border-radius:2px;font-weight:500">置顶</span>}
+                      <time style="font-size:12px;color:#aaa">{post.data.date ? new Date(post.data.date).toLocaleDateString('zh-CN') : ''}</time>
+                      {post.data.tags && Array.isArray(post.data.tags) && post.data.tags.length > 0 && (
                         <span style="font-size:11px;color:#7C7F83;background:#f5f5f5;padding:2px 8px;border-radius:2px">{post.data.tags[0]}</span>
                       )}
                     </div>

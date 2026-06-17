@@ -7,6 +7,7 @@ tags:
   - B2B
   - 网络营销
 image: /uploads/ScreenShot_2026-06-15_153503_169.png
+pinned: true
 ---
 
 ## 数字化不是目的，增长才是
