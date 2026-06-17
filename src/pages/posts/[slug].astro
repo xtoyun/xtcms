@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getContent } from '../../lib/content';
+import { autoLinkKeywords } from '../../lib/auto-link';
 import { marked } from 'marked';
 
 const { slug } = Astro.params;
@@ -16,7 +17,7 @@ if (post.data.link) {
   return Astro.redirect(post.data.link);
 }
 
-const htmlContent = post.body ? marked.parse(post.body) : '';
+const htmlContent = post.body ? autoLinkKeywords(marked.parse(post.body) as string) : '';
 ---
 
 <BaseLayout title={post.data.title} description={post.data.description}>

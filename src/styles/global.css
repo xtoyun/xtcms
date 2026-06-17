@@ -109,4 +109,15 @@
     color: #7C7F83;
     margin: 1.5em 0;
   }
+
+  /* SEO keyword auto-link */
+  .cms-content a.kw-link {
+    color: #1890ff;
+    text-decoration: none;
+    border-bottom: 1px dashed #1890ff;
+  }
+  .cms-content a.kw-link:hover {
+    color: #096dd9;
+    border-bottom-style: solid;
+  }
 }

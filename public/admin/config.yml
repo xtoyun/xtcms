@@ -111,6 +111,19 @@ collections:
       - { label: 页面标题, name: title, widget: string }
       - { label: 正文, name: body, widget: markdown }
 
+  - name: keywords
+    label: SEO关键字
+    label_singular: 关键字
+    folder: src/content/keywords
+    create: true
+    slug: "{{slug}}"
+    summary: "{{keyword}} → {{link}}"
+    editor:
+      preview: false
+    fields:
+      - { label: 关键字, name: keyword, widget: string }
+      - { label: 链接, name: link, widget: string }
+
   - name: messages
     label: 留言管理
     label_singular: 留言
