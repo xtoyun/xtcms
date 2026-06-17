@@ -17,6 +17,7 @@ const CONTENT_DIRS = [
   'src/content/pages',
   'src/content/messages',
   'src/content/settings',
+  'src/content/keywords',
 ];
 
 /** Directories to scan for asset files */
