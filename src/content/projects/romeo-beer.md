@@ -6,6 +6,6 @@ client: ''
 date: 2025-04-10
 image: /uploads/p24.jpg
 featured: true
-pinned: true
+pinned: false
 link: ''
 ---
