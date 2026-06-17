@@ -11,6 +11,11 @@ if (!post) {
   return Astro.redirect('/posts');
 }
 
+// If post has an external link, redirect
+if (post.data.link) {
+  return Astro.redirect(post.data.link);
+}
+
 const htmlContent = post.body ? marked.parse(post.body) : '';
 ---
 
