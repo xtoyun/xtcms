@@ -19,13 +19,18 @@ collections:
     summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
     view_groups:
       - label: 📌 置顶文章
         field: pinned
-        pattern: true
+        pattern: "true"
       - label: 文章列表
         field: pinned
-        pattern: false
+        pattern: "false"
     fields:
       - { label: 标题, name: title, widget: string }
       - { label: 描述, name: description, widget: text, required: false }
@@ -42,16 +47,21 @@ collections:
     folder: src/content/projects
     create: true
     slug: "{{slug}}"
-    summary: "{{pinned | ternary('📌 ', '')}}{{title}} — {{category}}"
+    summary: "{{title}} — {{category}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
     view_groups:
       - label: 📌 置顶项目
         field: pinned
-        pattern: true
+        pattern: "true"
       - label: 项目列表
         field: pinned
-        pattern: false
+        pattern: "false"
     fields:
       - { label: 项目名称, name: title, widget: string }
       - { label: 描述, name: description, widget: text }
