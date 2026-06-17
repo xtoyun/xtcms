@@ -21,6 +21,7 @@ collections:
     label_singular: 文章
     folder: src/content/posts
     create: true
+    identifier_field: title
     slug: "{{fields._slug}}"
     summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
     editor:
@@ -53,6 +54,7 @@ collections:
     label_singular: 项目
     folder: src/content/projects
     create: true
+    identifier_field: title
     slug: "{{fields._slug}}"
     summary: "{{title}} — {{category}}"
     editor:
