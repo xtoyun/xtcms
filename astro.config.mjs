@@ -6,6 +6,7 @@ import node from '@astrojs/node';
 export default defineConfig({
   devToolbar: { enabled: false },
   output: 'server',
+  prefetch: true,
   security: { checkOrigin: false },
   vite: { plugins: [tailwindcss()] },
   cacheDir: './node_modules/.astro-cache',
