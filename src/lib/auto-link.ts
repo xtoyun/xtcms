@@ -15,7 +15,7 @@ function getKeywords(): KeywordRule[] {
   }
   keywordsCache = getContent('src/content/keywords')
     .map(k => ({ keyword: k.data.keyword, link: k.data.link }))
-    .filter(k => k.keyword && k.link && k.keyword.length >= 2);
+    .filter(k => k.keyword && k.link);
   cacheTime = Date.now();
   return keywordsCache;
 }
@@ -70,7 +70,7 @@ export function autoLinkKeywords(html: string): string {
         if (replaced >= limit) return match;
         replaced++;
         counts[kw.keyword] = (counts[kw.keyword] || 0) + 1;
-        return `<a href="${kw.link}" class="kw-link">${match}</a>`;
+        return `<a href="${kw.link}" class="kw-link" target="_blank" rel="noopener" title="${kw.keyword}">${match}</a>`;
       });
     }
 
