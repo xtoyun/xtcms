@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import path from 'node:path';
 import fs from 'node:fs';
 
-const THUMB_WIDTH = 300;
+const THUMB_WIDTH = 600;
 const IMG_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
 
 export function isImage(filePath: string): boolean {
