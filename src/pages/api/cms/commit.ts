@@ -7,7 +7,6 @@ import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 
 import { CMS_SECRET } from '../../../lib/auth-config';
-import { processUploadedImage, isImage } from '../../../lib/image-utils';
 const SECRET = CMS_SECRET;
 
 interface FileChange {
@@ -69,72 +68,12 @@ export const POST: APIRoute = async ({ request }) => {
     const cwd = process.cwd();
     const results: Record<string, { sha: string }> = {};
 
-    // First pass: collect image renames (old path → new path)
-    const imageRenames: { oldPath: string; newPath: string }[] = [];
-
     for (const change of changes) {
       const absPath = path.join(cwd, change.path);
-
-      // Pre-process image uploads to detect renames
-      if ((change.action === 'create' || change.action === 'update') && change.data !== undefined && isImage(change.path)) {
-        const buf = change.encoding === 'base64'
-          ? Buffer.from(change.data, 'base64')
-          : Buffer.from(change.data, 'utf8');
-        ensureDir(absPath);
-        fs.writeFileSync(absPath, buf);
-
-        if (fs.existsSync(absPath)) {
-          const result = await processUploadedImage(absPath);
-          if (result) {
-            const dir = path.dirname(change.path);
-            const oldRel = change.path;
-            const newRel = (dir + '/' + result.newPath).replace(/\\/g, '/');
-            imageRenames.push({ oldPath: oldRel, newPath: newRel });
-            const content = fs.readFileSync(path.join(dir, result.newPath));
-            results[newRel] = { sha: sha1(content) };
-            continue;
-          }
-        }
-      }
-    }
-
-    // Second pass: first collect ALL image renames, then process text with replacements
-    const imageMap = new Map<string, string>(); // oldPath → newPath
-    const imageResults: Record<string, { sha: string }> = {};
-
-    // Process images first
-    for (const change of changes) {
-      const absPath = path.join(cwd, change.path);
-      if ((change.action === 'create' || change.action === 'update') && change.data !== undefined && isImage(change.path)) {
-        const buf = change.encoding === 'base64'
-          ? Buffer.from(change.data, 'base64')
-          : Buffer.from(change.data, 'utf8');
-        ensureDir(absPath);
-        fs.writeFileSync(absPath, buf);
-        const result = await processUploadedImage(absPath);
-        if (result) {
-          const dir = path.dirname(change.path);
-          const newRel = (dir + '/' + result.newPath).replace(/\\/g, '/');
-          imageMap.set(change.path, newRel);
-          const content = fs.readFileSync(path.join(dir, result.newPath));
-          imageResults[newRel] = { sha: sha1(content) };
-        }
-      }
-    }
-    Object.assign(results, imageResults);
-
-    // Then process all non-image changes (with path replacement)
-    for (const change of changes) {
-      const absPath = path.join(cwd, change.path);
-
-      // Skip images (already done)
-      if (imageMap.has(change.path)) continue;
 
       switch (change.action) {
         case 'delete': {
-          if (fs.existsSync(absPath)) {
-            fs.unlinkSync(absPath);
-          }
+          if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
           results[change.path] = { sha: '' };
           break;
         }
@@ -154,19 +93,11 @@ export const POST: APIRoute = async ({ request }) => {
         case 'create':
         case 'update': {
           if (change.data !== undefined) {
-            let content = change.encoding === 'base64'
-              ? Buffer.from(change.data, 'base64').toString('utf8')
-              : change.data;
-
-            // Replace old image paths with new paths in text content
-            for (const [oldPath, newPath] of imageMap) {
-              if (content.includes(oldPath)) {
-                content = content.replaceAll(oldPath, newPath);
-              }
-            }
-
+            const buf = change.encoding === 'base64'
+              ? Buffer.from(change.data, 'base64')
+              : Buffer.from(change.data, 'utf8');
             ensureDir(absPath);
-            fs.writeFileSync(absPath, content);
+            fs.writeFileSync(absPath, buf);
           }
           if (fs.existsSync(absPath)) {
             results[change.path] = { sha: sha1(fs.readFileSync(absPath)) };
