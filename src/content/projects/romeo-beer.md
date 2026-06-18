@@ -4,7 +4,7 @@ description: 精酿啤酒品牌的视觉设计与官网建设
 category: 品牌建设
 client: ''
 date: 2025-04-10
-image: /uploads/p24.jpg
+image: /uploads/00.png
 featured: true
 pinned: false
 link: ''
