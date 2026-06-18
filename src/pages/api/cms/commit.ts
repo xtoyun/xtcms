@@ -103,8 +103,22 @@ export const POST: APIRoute = async ({ request }) => {
             ensureDir(absPath);
             fs.writeFileSync(absPath, buf);
           }
-          if (fs.existsSync(absPath)) {
-            results[change.path] = { sha: sha1(fs.readFileSync(absPath)) };
+          let fileToHash = absPath;
+          // If file not at original path, search date folders (upload endpoint may have moved it)
+          if (!fs.existsSync(absPath)) {
+            const dir = path.dirname(absPath);
+            const name = path.basename(change.path);
+            if (fs.existsSync(dir)) {
+              const found = fs.readdirSync(dir, { withFileTypes: true })
+                .filter(d => d.isDirectory() && /^\d{8}$/.test(d.name))
+                .sort((a, b) => b.name.localeCompare(a.name))
+                .map(d => path.join(dir, d.name, name))
+                .find(p => fs.existsSync(p));
+              if (found) fileToHash = found;
+            }
+          }
+          if (fs.existsSync(fileToHash)) {
+            results[change.path] = { sha: sha1(fs.readFileSync(fileToHash)) };
           } else {
             results[change.path] = { sha: '' };
           }
