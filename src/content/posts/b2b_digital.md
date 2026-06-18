@@ -6,7 +6,7 @@ tags:
   - 数字化转型
   - B2B
   - 网络营销
-image: /uploads/20260618/min_self_vedio.png
+image: /uploads/20260618/to_dital.png
 pinned: true
 link: ''
 ---
