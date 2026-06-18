@@ -66,26 +66,35 @@ export async function processUploadedImage(absPath: string): Promise<{ newPath: 
   }
 
   const dateDir = todayFolder();
-  const newName = timestampFilename(path.basename(absPath));
-  const thumbName = newName.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
+  const originalName = path.basename(absPath);
+  const thumbName = originalName.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
 
   const dateAbsDir = path.join(baseDir, dateDir);
   fs.mkdirSync(dateAbsDir, { recursive: true });
 
-  const newAbsPath = path.join(dateAbsDir, newName);
+  const newAbsPath = path.join(dateAbsDir, originalName);
   const thumbAbsPath = path.join(dateAbsDir, thumbName);
 
   try {
-    fs.renameSync(absPath, newAbsPath);
+    // Handle name conflicts: add timestamp suffix if file already exists
+    let finalNewPath = newAbsPath;
+    let finalThumbPath = thumbAbsPath;
+    if (fs.existsSync(newAbsPath)) {
+      const ts = timestampFilename(originalName);
+      finalNewPath = path.join(dateAbsDir, ts);
+      finalThumbPath = path.join(dateAbsDir, ts.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`));
+    }
 
-    await sharp(newAbsPath)
+    fs.renameSync(absPath, finalNewPath);
+
+    await sharp(finalNewPath)
       .resize(THUMB_WIDTH, undefined, { withoutEnlargement: true })
       .jpeg({ quality: 75 })
-      .toFile(thumbAbsPath);
+      .toFile(finalThumbPath);
 
     return {
-      newPath: `${dateDir}/${newName}`,
-      thumbPath: `${dateDir}/${thumbName}`,
+      newPath: `${dateDir}/${path.basename(finalNewPath)}`,
+      thumbPath: `${dateDir}/${path.basename(finalThumbPath)}`,
     };
   } catch (e) {
     console.error('Image processing failed:', e);
