@@ -69,6 +69,36 @@ export const POST: APIRoute = async ({ request }) => {
     const cwd = process.cwd();
     const results: Record<string, { sha: string }> = {};
 
+    // First pass: collect image renames (old path → new path)
+    const imageRenames: { oldPath: string; newPath: string }[] = [];
+
+    for (const change of changes) {
+      const absPath = path.join(cwd, change.path);
+
+      // Pre-process image uploads to detect renames
+      if ((change.action === 'create' || change.action === 'update') && change.data !== undefined && isImage(change.path)) {
+        const buf = change.encoding === 'base64'
+          ? Buffer.from(change.data, 'base64')
+          : Buffer.from(change.data, 'utf8');
+        ensureDir(absPath);
+        fs.writeFileSync(absPath, buf);
+
+        if (fs.existsSync(absPath)) {
+          const result = await processUploadedImage(absPath);
+          if (result) {
+            const dir = path.dirname(change.path);
+            const oldRel = change.path;
+            const newRel = (dir + '/' + result.newPath).replace(/\\/g, '/');
+            imageRenames.push({ oldPath: oldRel, newPath: newRel });
+            const content = fs.readFileSync(path.join(dir, result.newPath));
+            results[newRel] = { sha: sha1(content) };
+            continue;
+          }
+        }
+      }
+    }
+
+    // Second pass: process all changes, updating text content with renamed paths
     for (const change of changes) {
       const absPath = path.join(cwd, change.path);
 
@@ -95,24 +125,26 @@ export const POST: APIRoute = async ({ request }) => {
         }
         case 'create':
         case 'update': {
-          if (change.data !== undefined) {
-            const buf = change.encoding === 'base64'
-              ? Buffer.from(change.data, 'base64')
-              : Buffer.from(change.data, 'utf8');
-            ensureDir(absPath);
-            fs.writeFileSync(absPath, buf);
+          // Skip images already processed in first pass
+          if (isImage(change.path) && imageRenames.some(r => r.oldPath === change.path)) {
+            break;
+          }
 
-            // Process new image uploads immediately: timestamp rename + thumbnail
-            if (isImage(change.path) && fs.existsSync(absPath)) {
-              const result = await processUploadedImage(absPath);
-              if (result) {
-                const dir = path.dirname(change.path);
-                const newPath = (dir + '/' + result.newPath).replace(/\\/g, '/');
-                const content = fs.readFileSync(path.join(dir, result.newPath));
-                results[newPath] = { sha: sha1(content) };
-                break;
+          if (change.data !== undefined) {
+            let content = change.encoding === 'base64'
+              ? Buffer.from(change.data, 'base64').toString('utf8')
+              : change.data;
+
+            // Replace old image paths with new paths in text content
+            for (const rename of imageRenames) {
+              const oldName = path.basename(rename.oldPath);
+              if (content.includes(oldName) || content.includes(rename.oldPath)) {
+                content = content.replaceAll(rename.oldPath, rename.newPath);
               }
             }
+
+            ensureDir(absPath);
+            fs.writeFileSync(absPath, content);
           }
           if (fs.existsSync(absPath)) {
             const content = fs.readFileSync(absPath);
