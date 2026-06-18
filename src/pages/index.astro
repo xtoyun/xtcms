@@ -79,7 +79,7 @@ const latestPosts = getContent('src/content/posts')
             {featuredProjects.map(project => (
               <a href={`/projects/${project.id}`} class="group block no-underline">
                 <div class="aspect-[4/3] bg-gray-100 overflow-hidden mb-4">
-                  <SafeImage src={project.data.image} alt={project.data.title} aspect="4/3" />
+                  <SafeImage src={project.data.image} alt={project.data.title} aspect="4/3" thumb />
                 </div>
                 <span style="font-size:13px;color:#7C7F83">{project.data.category}</span>
                 <h5 class="mt-1 group-hover:opacity-70 transition-opacity" style="color:#000">{project.data.title}</h5>
@@ -147,7 +147,7 @@ const latestPosts = getContent('src/content/posts')
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {latestPosts.map(post => (
             <a href={post.data.link || `/posts/${post.id}`} style="text-decoration:none;color:inherit;display:block;background:#fff;border:1px solid #eee;transition:border-color .3s,box-shadow .3s;overflow:hidden">
-              <SafeImage src={post.data.image} alt={post.data.title} aspect="16/9" />
+              <SafeImage src={post.data.image} alt={post.data.title} aspect="16/9" thumb />
               <div style="padding:28px 24px">
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
                   {post.data.pinned && <span style="font-size:10px;color:#d4380d;background:#fff2e8;border:1px solid #ffbb96;padding:1px 6px;border-radius:2px;font-weight:500">置顶</span>}

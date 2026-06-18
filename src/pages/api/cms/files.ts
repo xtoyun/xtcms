@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { CMS_SECRET } from '../../../lib/auth-config';
+import { processUploadedImage, isImage } from '../../../lib/image-utils';
 
 // Re-export for local use
 const SECRET = CMS_SECRET;
@@ -247,12 +248,23 @@ export const PUT: APIRoute = async ({ request }) => {
       fs.writeFileSync(absPath, buf);
     }
 
-    const stat = fs.statSync(absPath);
-    const content = fs.readFileSync(absPath);
+    // Auto-rename image: move to date folder + timestamp + generate thumbnail
+    let finalPath = filePath;
+    if (isImage(filePath) && fs.existsSync(absPath)) {
+      const result = await processUploadedImage(absPath);
+      if (result) {
+        const dir = path.dirname(filePath);
+        finalPath = (dir + '/' + result.newPath).replace(/\\/g, '/');
+      }
+    }
+
+    const finalAbs = path.join(process.cwd(), finalPath);
+    const stat = fs.existsSync(finalAbs) ? fs.statSync(finalAbs) : fs.statSync(absPath);
+    const content = fs.existsSync(finalAbs) ? fs.readFileSync(finalAbs) : fs.readFileSync(absPath);
     const newSha = sha1(content);
 
     return new Response(JSON.stringify({
-      path: filePath,
+      path: finalPath,
       sha: newSha,
       size: stat.size,
     }), {

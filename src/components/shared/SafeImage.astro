@@ -5,19 +5,24 @@ export interface Props {
   aspect?: string;
   label?: string;
   class?: string;
+  thumb?: boolean;
 }
 
-const { src, alt = '', aspect = '16/9', label = '雄韬 XTOCN', class: className = '' } = Astro.props;
+const { src, alt = '', aspect = '16/9', label = '雄韬 XTOCN', class: className = '', thumb = false } = Astro.props;
 
-// Filter out empty strings and obvious invalid values
-const hasSrc = src && src.trim().length > 0;
+// Build thumbnail path: /uploads/20260618.jpg → /uploads/20260618_thumb.jpg
+const imgSrc = thumb && src
+  ? src.replace(/\.(\w+)$/, '_thumb.$1').replace(/_thumb\.png$/, '_thumb.jpg')
+  : src;
+
+const hasSrc = imgSrc && imgSrc.trim().length > 0;
 ---
 
 <div style="aspect-ratio: {aspect}; overflow: hidden; position: relative; {className}">
   {hasSrc ? (
     <>
       <img
-        src={src}
+        src={imgSrc}
         alt={alt}
         style="width:100%;height:100%;object-fit:cover;display:block"
         onerror={`this.style.display='none';this.nextElementSibling.style.display='flex';`}

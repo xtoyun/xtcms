@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 
 import { CMS_SECRET } from '../../../lib/auth-config';
+import { processUploadedImage, isImage } from '../../../lib/image-utils';
 const SECRET = CMS_SECRET;
 
 interface FileChange {
@@ -100,6 +101,16 @@ export const POST: APIRoute = async ({ request }) => {
               : Buffer.from(change.data, 'utf8');
             ensureDir(absPath);
             fs.writeFileSync(absPath, buf);
+          }
+          // Auto-rename image: move to date folder + timestamp + generate thumbnail
+          if (isImage(change.path) && fs.existsSync(absPath)) {
+            const result = await processUploadedImage(absPath);
+            if (result) {
+              const dir = path.dirname(change.path);
+              const newPath = (dir + '/' + result.newPath).replace(/\\/g, '/');
+              results[newPath] = { sha: sha1(fs.readFileSync(path.join(dir, result.newPath))) };
+              break;
+            }
           }
           if (fs.existsSync(absPath)) {
             const content = fs.readFileSync(absPath);
