@@ -98,9 +98,37 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // Second pass: process all changes, updating text content with renamed paths
+    // Second pass: first collect ALL image renames, then process text with replacements
+    const imageMap = new Map<string, string>(); // oldPath → newPath
+    const imageResults: Record<string, { sha: string }> = {};
+
+    // Process images first
     for (const change of changes) {
       const absPath = path.join(cwd, change.path);
+      if ((change.action === 'create' || change.action === 'update') && change.data !== undefined && isImage(change.path)) {
+        const buf = change.encoding === 'base64'
+          ? Buffer.from(change.data, 'base64')
+          : Buffer.from(change.data, 'utf8');
+        ensureDir(absPath);
+        fs.writeFileSync(absPath, buf);
+        const result = await processUploadedImage(absPath);
+        if (result) {
+          const dir = path.dirname(change.path);
+          const newRel = (dir + '/' + result.newPath).replace(/\\/g, '/');
+          imageMap.set(change.path, newRel);
+          const content = fs.readFileSync(path.join(dir, result.newPath));
+          imageResults[newRel] = { sha: sha1(content) };
+        }
+      }
+    }
+    Object.assign(results, imageResults);
+
+    // Then process all non-image changes (with path replacement)
+    for (const change of changes) {
+      const absPath = path.join(cwd, change.path);
+
+      // Skip images (already done)
+      if (imageMap.has(change.path)) continue;
 
       switch (change.action) {
         case 'delete': {
@@ -118,28 +146,22 @@ export const POST: APIRoute = async ({ request }) => {
               fs.renameSync(prevAbs, absPath);
             }
           }
-          const stat = fs.statSync(absPath);
-          const content = fs.readFileSync(absPath);
-          results[change.path] = { sha: sha1(content) };
+          if (fs.existsSync(absPath)) {
+            results[change.path] = { sha: sha1(fs.readFileSync(absPath)) };
+          }
           break;
         }
         case 'create':
         case 'update': {
-          // Skip images already processed in first pass
-          if (isImage(change.path) && imageRenames.some(r => r.oldPath === change.path)) {
-            break;
-          }
-
           if (change.data !== undefined) {
             let content = change.encoding === 'base64'
               ? Buffer.from(change.data, 'base64').toString('utf8')
               : change.data;
 
             // Replace old image paths with new paths in text content
-            for (const rename of imageRenames) {
-              const oldName = path.basename(rename.oldPath);
-              if (content.includes(oldName) || content.includes(rename.oldPath)) {
-                content = content.replaceAll(rename.oldPath, rename.newPath);
+            for (const [oldPath, newPath] of imageMap) {
+              if (content.includes(oldPath)) {
+                content = content.replaceAll(oldPath, newPath);
               }
             }
 
@@ -147,8 +169,7 @@ export const POST: APIRoute = async ({ request }) => {
             fs.writeFileSync(absPath, content);
           }
           if (fs.existsSync(absPath)) {
-            const content = fs.readFileSync(absPath);
-            results[change.path] = { sha: sha1(content) };
+            results[change.path] = { sha: sha1(fs.readFileSync(absPath)) };
           } else {
             results[change.path] = { sha: '' };
           }
