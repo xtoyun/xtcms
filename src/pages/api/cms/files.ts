@@ -200,7 +200,9 @@ export const GET: APIRoute = async ({ request }) => {
       files.push(...scanDirectory(dir, cwd));
     }
     for (const dir of ASSET_DIRS) {
-      files.push(...scanDirectory(dir, cwd));
+      const scanned = scanDirectory(dir, cwd);
+      // Exclude thumbnail files from the media library
+      files.push(...scanned.filter(f => !f.name.includes('_thumb')));
     }
     for (const file of CONFIG_FILES) {
       const absPath = path.join(cwd, file);
