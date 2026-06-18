@@ -3,7 +3,7 @@ title: test323
 description: ''
 date: 2026-06-17
 tags: []
-image: /uploads/route1.jpg
+image: ''
 pinned: false
 draft: false
 link: ''
