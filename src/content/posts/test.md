@@ -3,7 +3,7 @@ title: test323
 description: ''
 date: 2026-06-17
 tags: []
-image: /uploads/20260618/xtcrm_index.png
+image: /uploads/route1.jpg
 pinned: false
 draft: false
 link: ''
