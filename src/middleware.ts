@@ -18,10 +18,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Serve static files from public/ directly — bypasses dist/client copies
-  // Only intercepts known static file extensions; everything else falls through to Astro
   const ext = path.extname(url.pathname).toLowerCase();
   if (ext && MIME[ext]) {
-    const publicPath = path.join(process.cwd(), 'public', url.pathname);
+    let publicPath = path.join(process.cwd(), 'public', url.pathname);
+
+    // If file not found, search date subdirectories (for renamed uploads)
+    if (!fs.existsSync(publicPath)) {
+      const dir = path.dirname(publicPath);
+      const name = path.basename(url.pathname);
+      if (fs.existsSync(dir)) {
+        const found = fs.readdirSync(dir, { withFileTypes: true })
+          .filter(d => d.isDirectory() && /^\d{8}$/.test(d.name))
+          .sort((a, b) => b.name.localeCompare(a.name))
+          .map(d => path.join(dir, d.name, name))
+          .find(p => fs.existsSync(p));
+        if (found) publicPath = found;
+      }
+    }
+
     if (fs.existsSync(publicPath)) {
       const buf = fs.readFileSync(publicPath);
       return new Response(buf, {

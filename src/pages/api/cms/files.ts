@@ -138,7 +138,22 @@ export const GET: APIRoute = async ({ request }) => {
 
   // Return a single media (binary) file
   if (mediaPath) {
-    const absPath = path.join(cwd, mediaPath);
+    let absPath = path.join(cwd, mediaPath);
+
+    // If file not found at original path, search date subdirectories
+    if (!fs.existsSync(absPath)) {
+      const dir = path.dirname(absPath);
+      const name = path.basename(mediaPath);
+      if (fs.existsSync(dir)) {
+        const found = fs.readdirSync(dir, { withFileTypes: true })
+          .filter(d => d.isDirectory() && /^\d{8}$/.test(d.name))
+          .sort((a, b) => b.name.localeCompare(a.name)) // newest first
+          .map(d => path.join(dir, d.name, name))
+          .find(p => fs.existsSync(p));
+        if (found) absPath = found;
+      }
+    }
+
     if (!fs.existsSync(absPath)) {
       return new Response('File not found', { status: 404 });
     }
