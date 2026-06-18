@@ -6,8 +6,9 @@ tags:
   - 数字化转型
   - B2B
   - 网络营销
-image: /uploads/ScreenShot_2026-06-15_153503_169.png
+image: /uploads/20260618/min_self_vedio.png
 pinned: true
+link: ''
 ---
 
 ## 数字化不是目的，增长才是
