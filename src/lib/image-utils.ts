@@ -40,7 +40,31 @@ export async function processUploadedImage(absPath: string): Promise<{ newPath: 
 
   const fs = await import('node:fs');
   const baseDir = path.dirname(absPath);
+  const parentDir = path.basename(baseDir);
   const ext = path.extname(absPath);
+
+  // Already in a date folder? Only generate thumbnail, don't re-rename
+  if (/^\d{8}$/.test(parentDir)) {
+    const thumbName = path.basename(absPath).replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
+    const thumbAbsPath = path.join(baseDir, thumbName);
+
+    // Skip if thumb already exists
+    if (fs.existsSync(thumbAbsPath)) {
+      return { newPath: `${parentDir}/${path.basename(absPath)}`, thumbPath: `${parentDir}/${thumbName}` };
+    }
+
+    try {
+      await sharp(absPath)
+        .resize(THUMB_WIDTH, undefined, { withoutEnlargement: true })
+        .jpeg({ quality: 75 })
+        .toFile(thumbAbsPath);
+      return { newPath: `${parentDir}/${path.basename(absPath)}`, thumbPath: `${parentDir}/${thumbName}` };
+    } catch (e) {
+      console.error('Thumbnail generation failed:', e);
+      return null;
+    }
+  }
+
   const dateDir = todayFolder();
   const newName = timestampFilename(path.basename(absPath));
   const thumbName = newName.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
