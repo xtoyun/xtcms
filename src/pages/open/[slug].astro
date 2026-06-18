@@ -1,0 +1,302 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const { slug } = Astro.params;
+
+const projects: Record<string, { name: string; tagline: string; intro: string; heroBg: string; accent: string; whyTitle: string; why: { old: string; new: string }[]; features: { icon: string; title: string; desc: string }[]; getStarted: string[]; tech: string[]; license: string; github: string }> = {
+  xtcms: {
+    name: 'XTCMS',
+    tagline: '轻建网，AI 驱动，构建未来。',
+    intro: 'XTCMS 重新定义建站。不再需要 PHP、MySQL、Apache 和无穷无尽的插件兼容调试——一个 Node 进程，一份干净的代码，一个浏览器里的后台，一切从简开始。',
+    heroBg: '#0a0a0a',
+    accent: '#fff',
+    whyTitle: '建站，本该如此简单。',
+    getStarted: [
+      'git clone https://github.com/xtocn/xtcms.git',
+      'cd xtcms && npm install',
+      'npm run dev          # → http://localhost:4321',
+      '                    # → http://localhost:4321/admin',
+      '# 上线',
+      'npm run build',
+      '# 传 dist/ public/ src/content/ .env 到服务器',
+      'npm start',
+    ],
+    why: [
+      { old: 'PHP + MySQL + Apache/Nginx', new: 'Node.js 一个进程' },
+      { old: '几十次数据库查询 / 页', new: '直读 Markdown 文件' },
+      { old: '插件市场碰运气', new: 'AI 写代码，完全自控' },
+      { old: '页面 200ms~2s', new: '首屏 50~100ms' },
+    ],
+    features: [
+      { icon: '⚡', title: '极致速度', desc: 'Astro 6 SSR 服务端渲染。页面直读 Markdown 文件，零数据库查询。首屏 50ms，SEO 天然满分。' },
+      { icon: '🤖', title: 'AI 施工队', desc: '不做主题市场、不做插件生态。想加功能？告诉 AI，它写代码。你审一下改一下，完全自控。' },
+      { icon: '📝', title: '在线编辑', desc: 'Sveltia CMS 驱动。文章、项目、服务、页面——全部可视化编辑。上传图片自动处理缩略图。' },
+      { icon: '🔗', title: 'SEO 内链', desc: '后台配置关键字+链接，正文自动匹配。每关键字最多 3 次链接，不堆砌，自然优化。' },
+      { icon: '📱', title: '全端适配', desc: '桌面左侧导航、手机顶部导航。预加载链接，悬停即请求，点击秒切换。' },
+      { icon: '🔌', title: '开放 API', desc: '外部系统可通过 REST API 提交文章和上传图片。OpenClaw Skill、自动化工具可直接接入。' },
+      { icon: '📦', title: '部署即用', desc: 'npm run build → 传 4 个目录到服务器 → npm start。不需要 Nginx、不需要 PM2。' },
+      { icon: '🛡️', title: '企业可信', desc: 'Apache-2.0 许可。治理文档、安全披露、行为准则齐全。不是个人仓库，是社区项目。' },
+    ],
+    tech: ['Astro 6', 'Tailwind CSS v4', 'Sveltia CMS', 'TypeScript', 'Node.js ≥22', 'sharp', 'marked'],
+    license: 'Apache-2.0',
+    github: 'https://github.com/xtocn/xtcms',
+  },
+  xtcrm: {
+    name: 'XTCRM',
+    tagline: 'AI 驱动，五层智能闭环，重新定义客户关系。',
+    intro: 'XTCRM 不是又一个 CRM——它是 AI 原生架构。从事件流到洞察引擎，从反馈闭环到 Agent Function Calling，AI 不是外挂功能，而是系统的基础设施。',
+    heroBg: '#0d1b2a',
+    accent: '#38bdf8',
+    whyTitle: '管客户，本该如此聪明。',
+    getStarted: [
+      'git clone https://github.com/xtoyun/xtcrm.git',
+      'cd xtcrm',
+      '# 前端',
+      'cd web && npm install && npm run dev',
+      '# 后端',
+      'cd ../server && composer install',
+      '# 导入数据库 xtcrm.sql',
+      '# 配置 .env（数据库、Redis、DeepSeek Key）',
+      '# 宝塔部署：Nginx 静态服务 web/dist + PHP API 代理',
+    ],
+    why: [
+      { old: 'CRM = 录入工具，AI 是外挂', new: '五层 AI 闭环，AI 是基础设施' },
+      { old: '只看报表，不知道干什么', new: '洞察引擎每日扫描，主动告诉你' },
+      { old: '功能固定，定制靠二开', new: '技能插件系统，不碰核心代码' },
+      { old: '单租户 or 天价多租户', new: 'store_id 原生多租户，开箱即用' },
+    ],
+    features: [
+      { icon: '🧠', title: '五层 AI 架构', desc: '事件流 → 服务层 → 洞察引擎 → 反馈闭环 → Agent 引擎。8 个内置工具，最多 8 轮 Function Calling。OpenAI / DeepSeek 双模型。' },
+      { icon: '👥', title: '客户全生命周期', desc: '客户 → 线索 → 报价 → 订单 → 合同 → 跟进。公海池自动回收规则，客户流转全追踪。' },
+      { icon: '📊', title: '工作台仪表盘', desc: 'KPI 卡片、漏斗图、收入趋势、AI 洞察通知。打开首页就知道今天该干什么。' },
+      { icon: '🔌', title: '技能插件系统', desc: '发票、报价、内容引擎……功能以 Skill 包形式安装。不改核心、不影响升级。' },
+      { icon: '🛡️', title: '多租户 + 权限', desc: '全局 store_id 数据隔离。前端路由权限 + 后端 API 级别 checkAction()，企业级安全。' },
+      { icon: '📚', title: '知识库引擎', desc: '产品知识、销售话术、竞品对比、成功案例。AI 调用知识库辅助销售决策。' },
+      { icon: '🏗️', title: '前后端分离', desc: 'Vue 3 + Ant Design Vue 4 前端。ThinkPHP 6.1 后端 API。MySQL + Redis 数据层。' },
+      { icon: '🇨🇳', title: '宝塔部署', desc: 'Nginx 静态服务前端 SPA + PHP API 代理。宝塔面板一键配置。国内服务器友好。' },
+    ],
+    tech: ['Vue 3', 'Ant Design Vue 4', 'ThinkPHP 6.1', 'MySQL', 'Redis', 'DeepSeek API', 'OpenAI API'],
+    license: 'Apache-2.0',
+    github: 'https://github.com/xtoyun/xtcrm',
+  },
+  'b2b-digital-diagnosis': {
+    name: 'B2B 数字化诊断',
+    tagline: '3 道题，2 分钟，看清你企业的专注基因。',
+    intro: '一套 AI 对话式诊断工具。通过 3 道选择题识别 B2B 企业的核心专注类型——能力驱动、行业驱动、还是问题驱动？诊断结果驱动网站架构、短视频策略、小程序定位等一整套数字化落地建议，并自动生成 5 页 PDF 报告。',
+    heroBg: '#1a0a2e',
+    accent: '#c084fc',
+    whyTitle: '诊断，本该如此简单。',
+    getStarted: [
+      'openclaw skills install @xtoyun/b2b-digital-diagnosis',
+      '',
+      '# 或者手动安装',
+      'git clone https://clawhub.ai/xtoyun/b2b-digital-diagnosis.git',
+      '# 放到 OpenClaw skills 目录',
+      '',
+      '# 首次使用会自动下载 Chromium（约180MB，仅一次）',
+      '# PDF 渲染秒级完成',
+    ],
+    why: [
+      { old: '咨询公司几万块诊断报告', new: 'AI 对话，3 道题，2 分钟' },
+      { old: 'PPT 模板改来改去', new: 'Playwright + Chromium 自动渲染 PDF' },
+      { old: '一套方案套所有企业', new: '能力/行业/问题三种类型精准匹配' },
+      { old: '品牌广告骚扰', new: '诊断过程品牌中立，只在封面出现' },
+    ],
+    features: [
+      { icon: '🧬', title: '专注基因识别', desc: '3 道选择题判定企业归属：能力型（技术极限）、行业型（生态深耕）、问题型（跨行业方案）。可追加决胜题处理混合型。' },
+      { icon: '💬', title: '对话式交互', desc: '每次只问一道题，不提前泄露得分倾向。用用户自己的语言提炼"原点能力"，不套模板。' },
+      { icon: '📄', title: '自动生成 PDF', desc: 'Playwright + Chromium 渲染 5 页结构化报告。封面 → 诊断结论 → 战略定位 → 数字化建议 → 短视频选题 → 行动清单。首次自动下载浏览器内核。' },
+      { icon: '🎯', title: '精准策略输出', desc: '按专注类型输出官网栏目架构（3核心栏目）、短视频选题清单（3选题+平台分发）、小程序功能定位、公众号内容策略。' },
+      { icon: '📚', title: '7 个行业案例库', desc: '空压机、密封件、制药包装、环保工程、精密模具、工业 MES、特种阀门——每种专注类型都有参照案例。' },
+      { icon: '🔌', title: '关键词自触发', desc: '用户提到"数字化""官网怎么做""B2B短视频"等关键词，Skill 自动激活。零学习成本，对话即诊断。' },
+      { icon: '🛡️', title: '品牌中立', desc: '只在自我介绍和报告封面出现雄韬 XTOCN 品牌。诊断过程中保持专业中立，不夹带广告。' },
+      { icon: '📦', title: '一键安装', desc: 'openclaw skills install @xtoyun/b2b-digital-diagnosis。ClawHub 平台发布，MIT-0 许可。' },
+    ],
+    tech: ['OpenClaw Skill', 'Playwright', 'Chromium', 'HTML/CSS', 'PDF 渲染', 'Node.js'],
+    license: 'MIT-0',
+    github: 'https://clawhub.ai/xtoyun/b2b-digital-diagnosis',
+  },
+  anchorframe: {
+    name: '雄韬创作锚',
+    tagline: '四锚锁定结构。不是填模板，是搭骨架。',
+    intro: 'Anchorframe（雄韬创作锚）是一套结构化内容创作引擎。独创"四锚框架"——方向锚定本质、引擎锚拆解 MES 机制、路径锚给出行动步骤、护栏锚划定边界。不是帮你填模板，是帮你搭骨架。',
+    heroBg: '#0a1c1a',
+    accent: '#2dd4bf',
+    whyTitle: '创作，不该从空白页开始。',
+    why: [
+      { old: '盯着空白页发呆', new: '四锚框架，给任何话题搭骨架' },
+      { old: '套模板，千篇一律', new: '5 种隐喻皮肤，每次都是新调性' },
+      { old: 'AI 写废话，给大词', new: '禁"赋能、闭环、抓手"，要求老兵口吻' },
+      { old: '只有文字稿', new: '6 种输出：大纲/脚本/诊断/语录/PDF/海报' },
+    ],
+    features: [
+      { icon: '⚓', title: '四锚框架', desc: '方向锚（本质是什么）、引擎锚（MES 拆解心智/执行/系统）、路径锚（怎么做）、护栏锚（边界在哪）。不是模板，是思维脚手架。' },
+      { icon: '🎭', title: '5 种隐喻皮肤', desc: '钓鱼、战争、农耕、航海、棋局——自动匹配或手动 --angle= 指定。同一个话题，五种完全不同的表达调性。' },
+      { icon: '📐', title: 'MES 引擎', desc: '认知机制（Mindset）、执行机制（Execution）、系统机制（System）。三层拆解，把"怎么做到的"讲清楚。' },
+      { icon: '📄', title: '6 种输出模式', desc: '大纲 → 完整脚本 → 内容诊断 → 语录集 → PDF 报告 → 图片海报。一个话题，全格式覆盖。' },
+      { icon: '🎯', title: '严格语调控制', desc: '禁止"赋能、闭环、抓手、底层逻辑"等大词。要求具体、直白、有画面感的老兵口吻。' },
+      { icon: '🧠', title: '四大元主题', desc: '产品化自己 · 环境塑造你 · 谁是你的朋友 · 你能不能赚到钱。所有内容最终指向这四条。' },
+      { icon: '🖼️', title: '视觉输出', desc: '集成 canvas-design，可直接生成内容海报。配合 PDF 输出，创作-发布一条龙。' },
+      { icon: '📦', title: '一键安装', desc: 'openclaw skills install @xtoyun/anchorframe。MIT-0 许可，ClawHub 平台发布。' },
+    ],
+    getStarted: [
+      'openclaw skills install @xtoyun/anchorframe',
+      '',
+      '# 使用',
+      '随便给个话题，Skill 自动启动创建流程',
+      '',
+      '# 可选参数',
+      '--angle=fishing     # 指定隐喻皮肤（fishing/warfare/farming/sailing/chess）',
+      '--mode=pdf          # 输出模式（outline/script/review/quotes/pdf/poster）',
+      '',
+      '> 需要 pandoc + wkhtmltopdf（PDF 输出时）',
+      '> 需要 canvas-design skill（海报输出时）',
+    ],
+    tech: ['OpenClaw Skill', 'Pandoc', 'wkhtmltopdf', 'canvas-design', 'MES Engine'],
+    license: 'MIT-0',
+    github: 'https://clawhub.ai/xtoyun/anchorframe',
+  },
+  yijing: {
+    name: '雄韬易经',
+    tagline: '64 卦不是算命，是中国人的决策模型。',
+    intro: '雄韬易经将 38 个易经卦象映射到现代商业场景——创业、竞争、合作、危机、转型。每一卦不是预言，而是一套情境分析框架。配合波特五力、经济护城河、精益创业等西方管理理论做"双格交叉验证"，中西合璧，给你 500~800 字结构化决策报告。',
+    heroBg: '#1a1408',
+    accent: '#fbbf24',
+    whyTitle: '决策，不靠运气靠框架。',
+    why: [
+      { old: '拍脑袋决策', new: '64 卦情境分析，七维拆解' },
+      { old: '东一榔头西一棒子', new: '错卦、综卦、互卦三维交叉校验' },
+      { old: '你说你的，他说他的', new: '易经 + 波特五力 + Moat 双格验证' },
+      { old: '看不懂古文', new: '现代商业语言，500~800 字直接可用' },
+    ],
+    features: [
+      { icon: '☯️', title: '38 卦商业映射', desc: '上经 30 卦全收录 + 下经精选 8 卦。每卦配现代商业情境卡片，信号词快速匹配——创业、竞争、合作、危机、转型。' },
+      { icon: '🔀', title: '卦象关系分析', desc: '错卦（对立视角）、综卦（反向视角）、互卦（内部视角）——三重视角交叉审视同一个决策。' },
+      { icon: '🌐', title: '中西双格验证', desc: '东方卦象 + 西方管理理论交叉验证。读者是投资人→用 Moat 语言；读者是工程师→用第一性原理。' },
+      { icon: '📊', title: '七维决策拆解', desc: '情境 → 爻位（阶段）→ 矛盾（阴阳）→ 策略 → 风险（关联卦）→ 演变（卦序）→ 中西对照。每卦 500~800 字结构化输出。' },
+      { icon: '🖼️', title: 'SVG 卦图生成', desc: '自动生成 64 卦 SVG 图形。支持 HTML 报告导出，浏览器直接另存为 PDF。' },
+      { icon: '📚', title: '内置知识库', desc: '速查表、模型卡片、概念索引、框架参考。不用背卦名，命令触发即出结果。' },
+      { icon: '🎯', title: '场景敏感', desc: '自动识别受众类型匹配管理语言。创业→精益画布，竞争→五力模型，转型→变革管理。' },
+      { icon: '📦', title: '一键安装', desc: 'openclaw skills install @xtoyun/yijing。MIT-0 许可。' },
+    ],
+    getStarted: [
+      'openclaw skills install @xtoyun/yijing',
+      '',
+      '# 使用',
+      '/雄韬易经 我们公司正在考虑进入一个竞争激烈的新市场',
+      '',
+      '# 或者',
+      '@雄韬易经 创业合伙人意见不合怎么办',
+      '',
+      '> 适用场景：创业决策、竞争分析、合作评估、危机处理、转型规划',
+      '> 输出：结构化分析报告（500~800 字）+ SVG 卦图 + HTML 报告',
+    ],
+    tech: ['OpenClaw Skill', 'SVG 卦图', 'HTML/CSS', 'Porter 五力', 'Moat 理论', '精益创业'],
+    license: 'MIT-0',
+    github: 'https://clawhub.ai/xtoyun/yijing',
+  },
+};
+
+const project = projects[slug || ''];
+if (!project) return Astro.redirect('/open');
+
+const FeatureIcon = (props: { emoji: string }) => `<span style="font-size:32px;display:block;margin-bottom:12px">${props.emoji}</span>`;
+---
+
+<BaseLayout title={project.name} description={project.tagline}>
+  <!-- ====== Hero ====== -->
+  <section style={`background:${project.heroBg};color:#fff;padding:100px 0 80px;text-align:center;margin-left:-40px;margin-right:-40px`}>
+    <div style="max-width:700px;margin:0 auto;padding:0 40px">
+      <p style="font-size:14px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:#999;margin-bottom:24px">Open Source Project</p>
+      <h1 style={`font-size:64px;font-weight:600;color:#fff;line-height:1.1;margin:0 0 20px 0;letter-spacing:-1px`}>
+        {project.name}
+      </h1>
+      <p style={`font-size:24px;font-weight:300;color:${project.accent};line-height:1.5;margin:0 0 40px 0`}>
+        {project.tagline}
+      </p>
+      <p style="font-size:17px;color:#999;line-height:1.8;max-width:560px;margin:0 auto 48px">
+        {project.intro}
+      </p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <a href={project.github} style={`background:${project.accent};color:${project.heroBg};text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:500;transition:opacity .2s`}>
+          查看源码 →
+        </a>
+        <a href="/open" style="background:transparent;color:#888;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:400;border:1px solid #333;transition:border-color .2s">
+          ← 返回列表
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div style="max-width:900px;margin:0 auto;padding:0 40px">
+
+    <!-- ====== 为什么 ====== -->
+    <section style="padding:80px 0">
+      <h2 style="font-size:14px;font-weight:600;letter-spacing:3px;color:#999;text-transform:uppercase;margin-bottom:16px">Why</h2>
+      <p style="font-size:36px;font-weight:500;color:#000;line-height:1.3;margin:0 0 40px 0;letter-spacing:-0.5px">
+        {project.whyTitle}
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+        {project.why.map((row, i) => (
+          <div style="border:1px solid #eee;padding:28px 24px;border-radius:10px">
+            <p style="font-size:13px;color:#aaa;margin:0 0 8px 0;text-decoration:line-through">{row.old}</p>
+            <p style="font-size:18px;font-weight:500;color:#000;margin:0">{row.new}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ====== 功能 ====== -->
+    <section style="padding:80px 0;border-top:1px solid #f0f0f0">
+      <h2 style="font-size:14px;font-weight:600;letter-spacing:3px;color:#999;text-transform:uppercase;margin-bottom:16px">Features</h2>
+      <p style="font-size:36px;font-weight:500;color:#000;line-height:1.3;margin:0 0 60px 0;letter-spacing:-0.5px">
+        一切从简，但无所不包。
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:32px">
+        {project.features.map(f => (
+          <div>
+            <div style="font-size:32px;margin-bottom:16px">{f.icon}</div>
+            <h3 style="font-size:19px;font-weight:500;color:#000;margin:0 0 8px 0">{f.title}</h3>
+            <p style="font-size:14px;color:#888;line-height:1.7;margin:0">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ====== 三分钟上手 ====== -->
+    <section style="padding:80px 0;border-top:1px solid #f0f0f0">
+      <h2 style="font-size:14px;font-weight:600;letter-spacing:3px;color:#999;text-transform:uppercase;margin-bottom:16px">Get Started</h2>
+      <p style="font-size:36px;font-weight:500;color:#000;line-height:1.3;margin:0 0 40px 0;letter-spacing:-0.5px">
+        三分钟上线。
+      </p>
+      <div style="background:#0a0a0a;border-radius:12px;padding:32px 36px;overflow-x:auto">
+        <pre style="color:#e0e0e0;font-family:'SF Mono','Fira Code',monospace;font-size:14px;line-height:2;margin:0" set:html={project.getStarted.map(line => {
+          if (!line) return '<br/>';
+          if (line.startsWith('#') || line.startsWith('//') || line.startsWith('>')) return `<span style="color:#888">${line}</span>`;
+          return `<span style="color:#e0e0e0">${line}</span>`;
+        }).join('\n')} /></pre>
+      </div>
+    </section>
+
+    <!-- ====== 技术栈 + 许可 ====== -->
+    <section style="padding:40px 0 80px;border-top:1px solid #f0f0f0;display:flex;gap:60px;flex-wrap:wrap">
+      <div>
+        <h2 style="font-size:14px;font-weight:600;letter-spacing:3px;color:#999;text-transform:uppercase;margin-bottom:20px">Tech</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          {project.tech.map(t => (
+            <span style="font-size:13px;color:#555;background:#f5f5f5;padding:6px 14px;border-radius:6px">{t}</span>
+          ))}
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:14px;font-weight:600;letter-spacing:3px;color:#999;text-transform:uppercase;margin-bottom:20px">License & Governance</h2>
+        <p style="font-size:15px;color:#555;line-height:1.8;margin:0">
+          {project.license} 许可。<br/>
+          治理文档 · 安全披露 · 行为准则 · 社区驱动。<br/>
+          <a href={project.github} style="color:#000;text-decoration:underline">GitHub →</a>
+        </p>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

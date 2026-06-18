@@ -1,0 +1,17 @@
+XTOCN Website
+Copyright 2026 XTOCN Open Source Contributors
+
+This product includes software developed by the XTOCN open source community
+(https://github.com/xtocn/xtcms).
+
+This product depends on and distributes modified versions of the following
+third-party open source software:
+
+  - Sveltia CMS (MIT) — https://github.com/sveltia/sveltia-cms
+  - Astro (MIT) — https://github.com/withastro/astro
+  - Tailwind CSS (MIT) — https://github.com/tailwindlabs/tailwindcss
+  - marked (MIT) — https://github.com/markedjs/marked
+  - sharp (Apache-2.0) — https://github.com/lovell/sharp
+
+The full license texts of these dependencies are available in their respective
+repositories or in the node_modules directory of this project.

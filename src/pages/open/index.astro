@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    slug: 'xtcms',
+    name: 'XTCMS',
+    tagline: '轻建网 · AI 辅助 · 想做什么就做什么',
+    desc: '一套 AI 辅助的轻量建站方案。基于 Astro 6 + Sveltia CMS，一个 Node 进程跑起来就是完整网站+后台。不需要 PHP、MySQL——代码干净、部署简单、AI 友好。',
+    tech: ['Astro 6', 'Tailwind CSS v4', 'Sveltia CMS', 'TypeScript', 'Node.js'],
+    license: 'Apache-2.0',
+  },
+  {
+    slug: 'xtcrm',
+    name: 'XTCRM',
+    tagline: 'AI 驱动 · 五层智能闭环 · 客户关系管理',
+    desc: '新一代 AI 原生 CRM。Vue 3 + Ant Design Vue 前端，ThinkPHP 6.1 后端。五层 AI 架构——事件流、洞察引擎、反馈闭环、Agent Function Calling，不是外挂 AI，是内置智能。',
+    tech: ['Vue 3', 'Ant Design Vue', 'ThinkPHP 6.1', 'MySQL', 'Redis', 'DeepSeek API'],
+    license: 'Apache-2.0',
+  },
+  {
+    slug: 'b2b-digital-diagnosis',
+    name: 'B2B 数字化诊断',
+    tagline: '3 道题看清企业专注基因 · AI 对话式诊断',
+    desc: 'OpenClaw AI Skill。3 道选择题判定 B2B 企业的专注类型，输出网站架构、短视频策略、小程序定位等数字化建议，自动生成 5 页 PDF 诊断报告。',
+    tech: ['OpenClaw Skill', 'Playwright', 'Chromium', 'PDF', 'HTML/CSS'],
+    license: 'MIT-0',
+  },
+  {
+    slug: 'anchorframe',
+    name: '雄韬创作锚',
+    tagline: '创作就怕没有灵感 · 四锚内容引擎',
+    desc: 'OpenClaw 内容创作 Skill。方向锚、引擎锚、路径锚、护栏锚——四锚框架锁定内容结构。5 种隐喻皮肤，6 种输出模式，从大纲到 PDF 到海报。',
+    tech: ['OpenClaw Skill', 'Pandoc', 'wkhtmltopdf', 'canvas-design', 'Markdown'],
+    license: 'MIT-0',
+  },
+  {
+    slug: 'yijing',
+    name: '雄韬易经',
+    tagline: '做生意好帮手 · 64 卦现代商业决策',
+    desc: 'OpenClaw AI Skill。将易经 64 卦映射到现代商业场景，中西管理理论交叉验证。不是占卜——是中国式决策心智模型。',
+    tech: ['OpenClaw Skill', 'SVG 卦图', 'HTML 报告', 'Porter 五力', 'Moat 理论'],
+    license: 'MIT-0',
+  },
+];
+---
+
+<BaseLayout title="开源项目" description="雄韬智网开源项目">
+  <section style="padding:60px 0">
+    <div style="max-width:800px;margin:0 auto;padding:0 40px">
+
+      <header style="margin-bottom:50px">
+        <h1 style="font-size:36px;font-weight:400;color:#000;margin-bottom:12px">开源<span style="font-weight:300">项目</span></h1>
+        <p style="font-size:16px;color:#7C7F83;line-height:1.8;margin:0">
+          我们相信好工具应该自由、透明，能被任何人审计和改进。
+        </p>
+      </header>
+
+      <div style="display:flex;flex-direction:column;gap:24px">
+        {projects.map(p => (
+          <a href={`/open/${p.slug}`} style="text-decoration:none;color:inherit;display:block;border:1px solid #eee;padding:36px 32px;transition:border-color .2s,box-shadow .2s">
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+              <h2 style="font-size:26px;font-weight:500;color:#000;margin:0">{p.name}</h2>
+              <span style="font-size:11px;color:#389e0d;background:#f6ffed;border:1px solid #b7eb8f;padding:1px 8px;border-radius:10px">活跃</span>
+            </div>
+            <p style="font-size:16px;font-weight:300;color:#7C7F83;margin:0 0 12px 0">{p.tagline}</p>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px 0">{p.desc}</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+              {p.tech.map(t => (
+                <span style="font-size:11px;color:#888;background:#f5f5f5;padding:3px 8px;border-radius:3px">{t}</span>
+              ))}
+            </div>
+            <span style="font-size:13px;color:#999">{p.license}</span>
+          </a>
+        ))}
+      </div>
+
+
+    </div>
+  </section>
+</BaseLayout>
