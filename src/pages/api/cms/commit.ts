@@ -74,6 +74,10 @@ export const POST: APIRoute = async ({ request }) => {
       switch (change.action) {
         case 'delete': {
           if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
+          // Also delete thumbnail if exists
+          const ext = path.extname(change.path);
+          const thumbPath = absPath.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
+          if (fs.existsSync(thumbPath)) fs.unlinkSync(thumbPath);
           results[change.path] = { sha: '' };
           break;
         }
