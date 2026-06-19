@@ -103,10 +103,65 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    // Collect all paths that were actually touched (for precise staging)
+    const pathsToStage = new Set<string>();
+    for (const change of changes) {
+      const absPath = path.join(cwd, change.path);
+      switch (change.action) {
+        case 'delete': {
+          pathsToStage.add(change.path);
+          // Also include thumbnail if it exists
+          const ext = path.extname(change.path);
+          const thumbRel = change.path.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
+          if (fs.existsSync(path.join(cwd, thumbRel))) {
+            pathsToStage.add(thumbRel);
+          }
+          break;
+        }
+        case 'move': {
+          if (change.previousPath) pathsToStage.add(change.previousPath);
+          pathsToStage.add(change.path);
+          break;
+        }
+        case 'create':
+        case 'update': {
+          // Use the actual on-disk path (may differ for uploads moved to date folders)
+          let actualPath = change.path;
+          if (!fs.existsSync(absPath)) {
+            const dir = path.dirname(absPath);
+            const name = path.basename(change.path);
+            if (fs.existsSync(dir)) {
+              const found = fs.readdirSync(dir, { withFileTypes: true })
+                .filter(d => d.isDirectory() && /^\d{8}$/.test(d.name))
+                .sort((a, b) => b.name.localeCompare(a.name))
+                .map(d => path.join(dir, d.name, name))
+                .find(p => fs.existsSync(p));
+              if (found) actualPath = path.relative(cwd, found).replace(/\\/g, '/');
+            }
+          }
+          if (fs.existsSync(path.join(cwd, actualPath))) {
+            pathsToStage.add(actualPath);
+          }
+          break;
+        }
+      }
+    }
+
     // Attempt git commit + push (non-blocking — continue even if git fails)
     let commitSha = '';
+    if (pathsToStage.size > 0) {
+      try {
+        // Stage only the specific files CMS touched, not the entire working tree
+        const fileArgs = [...pathsToStage].map(p => `"${p}"`).join(' ');
+        execSync(`git add -- ${fileArgs}`, { cwd, timeout: 10000 });
+      } catch {
+        // Fall back to add -A if precise staging fails (e.g. files outside repo)
+        try {
+          execSync('git add -A', { cwd, timeout: 10000 });
+        } catch { /* git may not be available */ }
+      }
+    }
     try {
-      execSync('git add -A', { cwd, timeout: 10000 });
       const diffCheck = execSync('git diff --cached --quiet', { cwd, timeout: 5000 });
       // If we reach here, there are no staged changes
     } catch {

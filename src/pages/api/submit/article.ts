@@ -62,9 +62,10 @@ ${content}
     fs.mkdirSync(postsDir, { recursive: true });
     fs.writeFileSync(path.join(postsDir, filename), md, 'utf8');
 
-    // Git commit (best effort)
+    // Git commit (best effort) — only stage the file we just created
+    const filePath = `src/content/posts/${filename}`;
     try {
-      execSync('git add -A', { cwd: process.cwd(), timeout: 5000 });
+      execSync(`git add -- "${filePath}"`, { cwd: process.cwd(), timeout: 5000 });
       execSync(`git commit -m "API: new article — ${title}" --author="API <api@xtocn.com>"`, {
         cwd: process.cwd(),
         timeout: 5000,
