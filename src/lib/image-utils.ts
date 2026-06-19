@@ -1,9 +1,14 @@
 import sharp from 'sharp';
 import path from 'node:path';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 
 const THUMB_WIDTH = 600;
 const IMG_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif']);
+
+function fileHash(absPath: string): string {
+  return crypto.createHash('md5').update(fs.readFileSync(absPath)).digest('hex');
+}
 
 export function isImage(filePath: string): boolean {
   return IMG_EXTS.has(path.extname(filePath).toLowerCase());
@@ -48,8 +53,20 @@ export async function processUploadedImage(absPath: string): Promise<{ newPath: 
   const dateAbsDir = path.join(baseDir, dateDir);
   fs.mkdirSync(dateAbsDir, { recursive: true });
 
-  // If same name exists, use timestamp to avoid conflict
-  if (fs.existsSync(path.join(dateAbsDir, finalName))) {
+  // If same name exists, check if it's the same file or a different one
+  const targetPath = path.join(dateAbsDir, finalName);
+  if (fs.existsSync(targetPath)) {
+    const existingSize = fs.statSync(targetPath).size;
+    const newSize = fs.statSync(absPath).size;
+
+    // Same size → very likely the same file. Verify with hash.
+    if (existingSize === newSize && fileHash(absPath) === fileHash(targetPath)) {
+      // It's the same file — don't create a duplicate, just return existing paths
+      const thumbName2 = finalName.replace(ext, `_thumb${ext === '.png' ? '.jpg' : ext}`);
+      return { newPath: `${dateDir}/${finalName}`, thumbPath: `${dateDir}/${thumbName2}` };
+    }
+
+    // Different file — use timestamp to avoid conflict
     finalName = timestampFilename(finalName);
   }
 
