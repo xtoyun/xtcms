@@ -62,16 +62,19 @@ ${content}
     fs.mkdirSync(postsDir, { recursive: true });
     fs.writeFileSync(path.join(postsDir, filename), md, 'utf8');
 
-    // Git commit (best effort) — only stage the file we just created
-    const filePath = `src/content/posts/${filename}`;
-    try {
-      execSync(`git add -- "${filePath}"`, { cwd: process.cwd(), timeout: 5000 });
-      execSync(`git commit -m "API: new article — ${title}" --author="API <api@xtocn.com>"`, {
-        cwd: process.cwd(),
-        timeout: 5000,
-        env: { ...process.env, GIT_AUTHOR_NAME: 'API', GIT_AUTHOR_EMAIL: 'api@xtocn.com', GIT_COMMITTER_NAME: 'API', GIT_COMMITTER_EMAIL: 'api@xtocn.com' },
-      });
-    } catch { /* git optional */ }
+    // Git auto-commit is disabled — file is saved to disk, manual commit required.
+    // To re-enable, set environment variable: CMS_AUTO_COMMIT=true
+    if (process.env.CMS_AUTO_COMMIT === 'true') {
+      const filePath = `src/content/posts/${filename}`;
+      try {
+        execSync(`git add -- "${filePath}"`, { cwd: process.cwd(), timeout: 5000 });
+        execSync(`git commit -m "API: new article — ${title}" --author="API <api@xtocn.com>"`, {
+          cwd: process.cwd(),
+          timeout: 5000,
+          env: { ...process.env, GIT_AUTHOR_NAME: 'API', GIT_AUTHOR_EMAIL: 'api@xtocn.com', GIT_COMMITTER_NAME: 'API', GIT_COMMITTER_EMAIL: 'api@xtocn.com' },
+        });
+      } catch { /* git optional */ }
+    }
 
     return apiSuccess({
       success: true,

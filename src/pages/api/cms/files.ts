@@ -8,6 +8,11 @@ import { verifyToken } from '../../../lib/auth';
 import { processUploadedImage, isImage } from '../../../lib/image-utils';
 import { apiError, apiSuccess } from '../../../lib/api-response';
 
+/** Read env var, matching auth-config.ts pattern (import.meta.env first, then process.env). */
+function env(key: string): string | undefined {
+  return (import.meta.env as Record<string, string>)[key] ?? process.env[key];
+}
+
 /** Directories to scan for content files */
 const CONTENT_DIRS = [
   'src/content/posts',
@@ -34,6 +39,69 @@ const TEXT_EXTENSIONS = new Set([
 
 /** Max file size to read as text (5 MB) */
 const MAX_TEXT_SIZE = 5 * 1024 * 1024;
+
+/** Map collection param to content directory */
+const COLLECTION_DIRS: Record<string, string> = {
+  posts: 'src/content/posts',
+  projects: 'src/content/projects',
+  services: 'src/content/services',
+  pages: 'src/content/pages',
+  messages: 'src/content/messages',
+  settings: 'src/content/settings',
+  keywords: 'src/content/keywords',
+};
+
+/**
+ * Extract a single field value from a markdown file's YAML frontmatter.
+ * Reads only the first 4KB of the file — avoids loading full article bodies.
+ */
+function getFieldValue(absPath: string, field: string): string | boolean | number | undefined {
+  try {
+    const fd = fs.openSync(absPath, 'r');
+    const buf = Buffer.alloc(4096);
+    const bytesRead = fs.readSync(fd, buf, 0, 4096, 0);
+    fs.closeSync(fd);
+
+    const head = buf.toString('utf8', 0, bytesRead);
+    const fmMatch = head.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) return undefined;
+
+    // Parse the YAML frontmatter block manually (top-level scalar values only)
+    const yamlBlock = fmMatch[1];
+    // Try matching field: value (handles quoted/unquoted strings, booleans)
+    const patterns = [
+      new RegExp(`^${field}:\\s*"([^"]*)"\\s*$`, 'm'),
+      new RegExp(`^${field}:\\s*'([^']*)'\\s*$`, 'm'),
+      new RegExp(`^${field}:\\s*(true|false)\\s*$`, 'm'),
+      new RegExp(`^${field}:\\s*(.+)\\s*$`, 'm'),
+    ];
+
+    for (const pat of patterns) {
+      const m = yamlBlock.match(pat);
+      if (m) {
+        const val = m[1].trim();
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        // Try number
+        const num = Number(val);
+        if (!isNaN(num) && val !== '') return num;
+        return val;
+      }
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Lightweight entry for sorting — only metadata, no full content */
+interface EntryMeta {
+  name: string;
+  path: string;
+  pinned: boolean;
+  date: string;
+  title: string;
+}
 
 function sha1(content: string | Buffer): string {
   return crypto.createHash('sha1').update(content).digest('hex');
@@ -163,6 +231,110 @@ export const GET: APIRoute = async ({ request }) => {
     });
   }
 
+  // ── Paginated list mode (new) ──
+  // Triggered when ?collection= is present. Falls back to legacy behaviour otherwise.
+  const collectionParam = url.searchParams.get('collection');
+  if (listMode === 'true' && collectionParam) {
+    const dir = COLLECTION_DIRS[collectionParam];
+    if (!dir) {
+      return apiError(`Unknown collection: ${collectionParam}`, 400);
+    }
+
+    const absDir = path.join(cwd, dir);
+    if (!fs.existsSync(absDir)) {
+      return apiSuccess({ entries: [], pagination: { page: 1, limit: 0, total: 0, totalPages: 0 } });
+    }
+
+    const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
+    // Read default page size from env (same pattern as auth-config.ts)
+    const defaultLimit = parseInt(env('CMS_PAGE_SIZE') || '50', 10) || 50;
+    const limit = Math.min(200, Math.max(1, parseInt(url.searchParams.get('limit') || String(defaultLimit), 10) || defaultLimit));
+    const sortField = url.searchParams.get('sort') || 'pinned';
+    const sortOrder = url.searchParams.get('order') === 'asc' ? 'asc' : 'desc';
+
+    // 1. Scan filenames, extract sort metadata from frontmatter (no full reads yet)
+    const allMetas: EntryMeta[] = [];
+    for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+      const absPath = path.join(absDir, entry.name);
+      const relPath = path.join(dir, entry.name).replace(/\\/g, '/');
+
+      const pinned = getFieldValue(absPath, 'pinned');
+      const date = getFieldValue(absPath, 'date');
+      const title = getFieldValue(absPath, 'title');
+
+      allMetas.push({
+        name: entry.name,
+        path: relPath,
+        pinned: pinned === true,
+        date: typeof date === 'string' ? date : (typeof date === 'number' ? String(date) : ''),
+        title: typeof title === 'string' ? title : entry.name.replace(/\.md$/, ''),
+      });
+    }
+
+    // 2. Sort (stable: filename as final tiebreaker)
+    const desc = sortOrder === 'desc';
+    allMetas.sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'pinned':
+          cmp = (a.pinned ? 1 : 0) - (b.pinned ? 1 : 0);
+          if (cmp === 0) {
+            cmp = a.date.localeCompare(b.date);
+          }
+          break;
+        case 'date':
+          cmp = a.date.localeCompare(b.date);
+          break;
+        case 'title':
+          cmp = a.title.localeCompare(b.title, 'zh-CN');
+          break;
+        default:
+          cmp = a.date.localeCompare(b.date);
+      }
+      if (cmp === 0) cmp = a.name.localeCompare(b.name);
+      return desc ? -cmp : cmp;
+    });
+
+    const total = allMetas.length;
+    const totalPages = Math.ceil(total / limit);
+    const paged = allMetas.slice((page - 1) * limit, page * limit);
+
+    // 3. Read full content only for the requested page
+    const entries: FileEntry[] = [];
+    for (const meta of paged) {
+      const absPath = path.join(absDir, meta.name);
+      try {
+        const stat = fs.statSync(absPath);
+        if (isTextFile(meta.path) && stat.size <= MAX_TEXT_SIZE) {
+          const text = fs.readFileSync(absPath, 'utf8');
+          entries.push({
+            path: meta.path,
+            sha: sha1(text),
+            size: stat.size,
+            name: meta.name,
+            text,
+          });
+        } else {
+          entries.push({
+            path: meta.path,
+            sha: sha1(fs.readFileSync(absPath)),
+            size: stat.size,
+            name: meta.name,
+          });
+        }
+      } catch {
+        // Skip files that vanished between scan and read
+      }
+    }
+
+    return apiSuccess({
+      entries,
+      pagination: { page, limit, total, totalPages },
+    });
+  }
+
+  // ── Legacy full-list mode ──
   // List all files (recursive scan)
   if (listMode === 'true') {
     const files: FileEntry[] = [];
