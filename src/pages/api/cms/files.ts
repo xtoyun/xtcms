@@ -4,11 +4,9 @@ import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { CMS_SECRET } from '../../../lib/auth-config';
+import { verifyToken } from '../../../lib/auth';
 import { processUploadedImage, isImage } from '../../../lib/image-utils';
-
-// Re-export for local use
-const SECRET = CMS_SECRET;
+import { apiError, apiSuccess } from '../../../lib/api-response';
 
 /** Directories to scan for content files */
 const CONTENT_DIRS = [
@@ -36,24 +34,6 @@ const TEXT_EXTENSIONS = new Set([
 
 /** Max file size to read as text (5 MB) */
 const MAX_TEXT_SIZE = 5 * 1024 * 1024;
-
-function verifyToken(request: Request): { username: string } | null {
-  const auth = request.headers.get('Authorization');
-  if (!auth || !auth.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const parts = token.split('.');
-  if (parts.length !== 2) return null;
-  const [payload, signature] = parts;
-  const expected = crypto.createHmac('sha256', SECRET).update(payload).digest('base64url');
-  if (signature !== expected) return null;
-  try {
-    const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
-    if (Date.now() > data.exp) return null;
-    return { username: data.username };
-  } catch {
-    return null;
-  }
-}
 
 function sha1(content: string | Buffer): string {
   return crypto.createHash('sha1').update(content).digest('hex');
@@ -123,10 +103,7 @@ function ensureDir(filePath: string) {
 export const GET: APIRoute = async ({ request }) => {
   const user = verifyToken(request);
   if (!user) {
-    return new Response(JSON.stringify({ error: '未授权' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('未授权', 401);
   }
 
   const url = new URL(request.url);
@@ -173,22 +150,16 @@ export const GET: APIRoute = async ({ request }) => {
   if (filePath) {
     const absPath = path.join(cwd, filePath);
     if (!fs.existsSync(absPath)) {
-      return new Response(JSON.stringify({ error: 'File not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiError('File not found', 404);
     }
     const stat = fs.statSync(absPath);
     const content = fs.readFileSync(absPath, 'utf8');
-    return new Response(JSON.stringify({
+    return apiSuccess({
       path: filePath,
       sha: sha1(content),
       size: stat.size,
       name: path.basename(filePath),
       text: content,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -219,35 +190,23 @@ export const GET: APIRoute = async ({ request }) => {
       }
     }
 
-    return new Response(JSON.stringify({ files }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiSuccess({ files });
   }
 
-  return new Response(JSON.stringify({ error: 'Missing parameter: use ?list=true or ?path=...' }), {
-    status: 400,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return apiError('Missing parameter: use ?list=true or ?path=...', 400);
 };
 
 export const PUT: APIRoute = async ({ request }) => {
   const user = verifyToken(request);
   if (!user) {
-    return new Response(JSON.stringify({ error: '未授权' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('未授权', 401);
   }
 
   const url = new URL(request.url);
   const filePath = url.searchParams.get('path');
 
   if (!filePath) {
-    return new Response(JSON.stringify({ error: 'Missing path parameter' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('Missing path parameter', 400);
   }
 
   const cwd = process.cwd();
@@ -280,39 +239,27 @@ export const PUT: APIRoute = async ({ request }) => {
     const content = fs.existsSync(finalAbs) ? fs.readFileSync(finalAbs) : fs.readFileSync(absPath);
     const newSha = sha1(content);
 
-    return new Response(JSON.stringify({
+    return apiSuccess({
       path: finalPath,
       sha: newSha,
       size: stat.size,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: `写入失败: ${(e as Error).message}` }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError(`写入失败: ${(e as Error).message}`, 500);
   }
 };
 
 export const DELETE: APIRoute = async ({ request }) => {
   const user = verifyToken(request);
   if (!user) {
-    return new Response(JSON.stringify({ error: '未授权' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('未授权', 401);
   }
 
   const url = new URL(request.url);
   const filePath = url.searchParams.get('path');
 
   if (!filePath) {
-    return new Response(JSON.stringify({ error: 'Missing path parameter' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('Missing path parameter', 400);
   }
 
   const absPath = path.join(process.cwd(), filePath);
@@ -321,14 +268,8 @@ export const DELETE: APIRoute = async ({ request }) => {
     if (fs.existsSync(absPath)) {
       fs.unlinkSync(absPath);
     }
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiSuccess({ success: true });
   } catch (e) {
-    return new Response(JSON.stringify({ error: `删除失败: ${(e as Error).message}` }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError(`删除失败: ${(e as Error).message}`, 500);
   }
 };

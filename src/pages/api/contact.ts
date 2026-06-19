@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
+import { apiError } from '../../lib/api-response';
 
 export const POST: APIRoute = async ({ request, url }) => {
   try {
@@ -38,6 +39,6 @@ ${message}
       headers: { Location: '/contact/success' }
     });
   } catch (e) {
-    return new Response('提交失败：' + (e as Error).message, { status: 500 });
+    return apiError(`提交失败: ${(e as Error).message}`, 500);
   }
 };

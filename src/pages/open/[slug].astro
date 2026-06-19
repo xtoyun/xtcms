@@ -195,6 +195,48 @@ const projects: Record<string, { name: string; tagline: string; intro: string; h
     license: 'MIT-0',
     github: 'https://clawhub.ai/xtoyun/yijing',
   },
+  'company-headlines': {
+    name: '企业头条助手',
+    tagline: '让每个公司都能写出专业级的公关新闻稿。',
+    intro: '企业头条助手是一套专业的公关新闻稿生成工具。18 个新闻类别 × 多渠道输出（公众号、官网、内部通讯、抖音），6 个行业预设。不只是写稿——还会生成 PNG 视觉海报。更有 7 条内容红线，确保 AI 产出专业可信，不越界。',
+    heroBg: '#0a1628',
+    accent: '#60a5fa',
+    whyTitle: '企业公关，不该靠拍脑袋。',
+    why: [
+      { old: '公关稿靠一个人憋', new: '18 类别模板 + 6 行业预设，3 分钟出稿' },
+      { old: '写完了不知道对不对', new: '每条输出自带自查清单' },
+      { old: 'AI 胡说八道没人管', new: '7 条红线：不造神、有数据、有主语、不造假' },
+      { old: '写完文字还要做图', new: 'Playwright 自动渲染 PNG 海报，多尺寸适配' },
+    ],
+    features: [
+      { icon: '📰', title: '18 个新闻类别', desc: '客户考察、签约仪式、技术升级、合作发布、节日问候、行业动态……覆盖企业公关全场景。每类配专用 prompt 模板。' },
+      { icon: '🏭', title: '6 个行业预设', desc: '制造业、财税、科技 SaaS、新能源、电商消费、通用。行业专用语料和发布规范，出稿更精准。' },
+      { icon: '🖼️', title: '自动生成海报', desc: 'Playwright + Chromium 渲染 PNG 海报。节日 800×1200、公众号封面 900×500、社交卡片 600×800、内部通知 750×400。' },
+      { icon: '📐', title: '四级事件分级', desc: 'L1 日常 → L4 敏感。L4 只给叙事框架，不自动生成内容。越重要的事，人审越多。' },
+      { icon: '✅', title: '7 条内容红线', desc: '不造神（禁用"颠覆""革命"）、有数据（技术稿至少 1 个数字）、有主语、忌空洞、分渠道、不造假。每条输出自带自查清单。' },
+      { icon: '🛠️', title: '品牌配置向导', desc: '7 个问题，3 分钟完成品牌档案。公司定位、核心优势、品牌调性，一次配置，永久生效。' },
+      { icon: '📡', title: '多渠道适配', desc: '公众号有公众号的口吻，官网有官网的调性，内部通讯有内部通讯的语气。自动切换，不是复制粘贴。' },
+      { icon: '📦', title: '一键安装', desc: 'openclaw skills install @xtoyun/company-headlines。自动安装 Playwright + Chromium。MIT-0 许可。' },
+    ],
+    getStarted: [
+      'openclaw skills install @xtoyun/company-headlines',
+      '',
+      '# 首次使用：配置品牌',
+      '/头条 配置                     # 7 题 3 分钟完成品牌档案',
+      '',
+      '# 日常使用',
+      '/头条                           # 进入类别选择菜单',
+      '/头条 客户考察                  # 直接指定类别',
+      '/头条 节日 端午                 # 类别 + 具体场景',
+      '/头条 行业包                   # 查看/切换行业预设',
+      '',
+      '> 自动安装 Playwright + Chromium（首次，约 180MB）',
+      '> 输出版本：公众号文案 + 官网新闻稿 + 内部通报 + PNG 海报',
+    ],
+    tech: ['OpenClaw Skill', 'Playwright', 'Chromium', 'HTML/CSS', '品牌配置向导'],
+    license: 'MIT-0',
+    github: 'https://clawhub.ai/xtoyun/company-headlines',
+  },
 };
 
 const project = projects[slug || ''];
@@ -205,7 +247,7 @@ const FeatureIcon = (props: { emoji: string }) => `<span style="font-size:32px;d
 
 <BaseLayout title={project.name} description={project.tagline}>
   <!-- ====== Hero ====== -->
-  <section style={`background:${project.heroBg};color:#fff;padding:100px 0 80px;text-align:center;margin-left:-40px;margin-right:-40px`}>
+  <section style={`background:${project.heroBg};color:#fff;padding:100px 0 80px;text-align:center`}>
     <div style="max-width:700px;margin:0 auto;padding:0 40px">
       <p style="font-size:14px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:#999;margin-bottom:24px">Open Source Project</p>
       <h1 style={`font-size:64px;font-weight:600;color:#fff;line-height:1.1;margin:0 0 20px 0;letter-spacing:-1px`}>
@@ -269,7 +311,7 @@ const FeatureIcon = (props: { emoji: string }) => `<span style="font-size:32px;d
       <p style="font-size:36px;font-weight:500;color:#000;line-height:1.3;margin:0 0 40px 0;letter-spacing:-0.5px">
         三分钟上线。
       </p>
-      <div style="background:#0a0a0a;border-radius:12px;padding:32px 36px;overflow-x:auto">
+      <div style="background:#0a0a0a;border-radius:12px;padding:32px 36px;overflow-x:auto;max-width:100%">
         <pre style="color:#e0e0e0;font-family:'SF Mono','Fira Code',monospace;font-size:14px;line-height:2;margin:0" set:html={project.getStarted.map(line => {
           if (!line) return '<br/>';
           if (line.startsWith('#') || line.startsWith('//') || line.startsWith('>')) return `<span style="color:#888">${line}</span>`;

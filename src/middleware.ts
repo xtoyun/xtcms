@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import fs from 'node:fs';
 import path from 'node:path';
+import { verifyTokenFromCookie } from './lib/auth';
 
 const MIME: Record<string, string> = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
@@ -9,12 +10,27 @@ const MIME: Record<string, string> = {
   '.mp4': 'video/mp4', '.webm': 'video/webm',
 };
 
+/** Admin sub-routes that need authentication (excludes /admin/ which is Sveltia CMS). */
+const PROTECTED_ADMIN = /^\/admin\/(edit|delete)/;
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(context.request.url);
 
   // Redirect /admin to /admin/
   if (url.pathname === '/admin') {
     return new Response(null, { status: 301, headers: { Location: '/admin/' } });
+  }
+
+  // Protect custom admin sub-routes with cookie-based auth
+  if (PROTECTED_ADMIN.test(url.pathname)) {
+    const user = verifyTokenFromCookie(context.request);
+    if (!user) {
+      // Redirect to Sveltia CMS login page
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/admin/' },
+      });
+    }
   }
 
   // Serve static files from public/ directly — bypasses dist/client copies
@@ -44,7 +60,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Serve CMS admin page
+  // Serve CMS admin page (Sveltia CMS — handles its own auth via /api/cms/auth)
   if (url.pathname === '/admin/') {
     return new Response(fs.readFileSync('public/admin/index.html', 'utf8'), {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },

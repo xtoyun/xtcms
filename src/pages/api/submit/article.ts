@@ -3,8 +3,8 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
+import { apiError, apiSuccess } from '../../../lib/api-response';
 
 // API key for external access — set in .env, defaults to a dev key
 const API_KEY = process.env.CMS_API_KEY || 'xtocn-api-key-change-me';
@@ -27,10 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
   const auth = request.headers.get('Authorization');
   const key = auth?.startsWith('Bearer ') ? auth.slice(7) : '';
   if (key !== API_KEY) {
-    return new Response(JSON.stringify({ error: '无效的 API Key' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('无效的 API Key', 401);
   }
 
   try {
@@ -38,10 +35,7 @@ export const POST: APIRoute = async ({ request }) => {
     const { title, description, content, tags, image, draft } = body || {};
 
     if (!title || !content) {
-      return new Response(JSON.stringify({ error: 'title 和 content 为必填字段' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiError('title 和 content 为必填字段', 400);
     }
 
     const slug = slugify(title);
@@ -78,19 +72,13 @@ ${content}
       });
     } catch { /* git optional */ }
 
-    return new Response(JSON.stringify({
+    return apiSuccess({
       success: true,
       slug: filename.replace('.md', ''),
       url: `/posts/${filename.replace('.md', '')}`,
       filename,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: `提交失败: ${(e as Error).message}` }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError(`提交失败: ${(e as Error).message}`, 500);
   }
 };

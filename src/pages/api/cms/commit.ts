@@ -6,8 +6,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 
-import { CMS_SECRET } from '../../../lib/auth-config';
-const SECRET = CMS_SECRET;
+import { verifyToken } from '../../../lib/auth';
+import { apiError, apiSuccess } from '../../../lib/api-response';
 
 interface FileChange {
   action: 'create' | 'update' | 'move' | 'delete';
@@ -16,24 +16,6 @@ interface FileChange {
   previousSha?: string;
   data?: string; // base64 or text content
   encoding?: 'base64' | 'utf8';
-}
-
-function verifyToken(request: Request): { username: string } | null {
-  const auth = request.headers.get('Authorization');
-  if (!auth || !auth.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const parts = token.split('.');
-  if (parts.length !== 2) return null;
-  const [payload, signature] = parts;
-  const expected = crypto.createHmac('sha256', SECRET).update(payload).digest('base64url');
-  if (signature !== expected) return null;
-  try {
-    const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
-    if (Date.now() > data.exp) return null;
-    return { username: data.username };
-  } catch {
-    return null;
-  }
 }
 
 function sha1(content: string | Buffer): string {
@@ -48,10 +30,7 @@ function ensureDir(filePath: string) {
 export const POST: APIRoute = async ({ request }) => {
   const user = verifyToken(request);
   if (!user) {
-    return new Response(JSON.stringify({ error: '未授权' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError('未授权', 401);
   }
 
   try {
@@ -59,10 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
     const changes: FileChange[] = body.changes || [];
 
     if (!changes.length) {
-      return new Response(JSON.stringify({ error: 'No changes provided' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiError('No changes provided', 400);
     }
 
     const cwd = process.cwd();
@@ -159,17 +135,11 @@ export const POST: APIRoute = async ({ request }) => {
       commitSha = `local-${Date.now()}`;
     }
 
-    return new Response(JSON.stringify({
+    return apiSuccess({
       sha: commitSha,
       files: results,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: `提交失败: ${(e as Error).message}` }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return apiError(`提交失败: ${(e as Error).message}`, 500);
   }
 };

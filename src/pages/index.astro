@@ -130,6 +130,43 @@ const latestPosts = getContent('src/content/posts')
     </div>
   </section>
 
+  <!-- ===== 开源项目 ===== -->
+  <section style="padding:60px 0;background:#fafafa">
+    <div class="container-main">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:40px">
+        <div>
+          <h2 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.2em">开源<span style="font-weight:300">项目</span></h2>
+          <p style="font-size:15px;color:#7C7F83;margin:0">Apache-2.0 许可 · 社区驱动 · 自由开放</p>
+        </div>
+        <a href="/open" style="font-size:14px;color:#7C7F83;text-decoration:none;display:flex;align-items:center;gap:4px">
+          查看全部
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { name: 'XTCMS', tag: '轻建网', desc: 'AI 辅助的轻量建站方案。Astro 6 + Sveltia CMS，一个 Node 进程跑起来就是网站+后台。', img: '/ky/ky_xtcms.png', slug: 'xtcms' },
+          { name: 'XTCRM', tag: '管客户', desc: 'AI 原生 CRM。五层智能闭环，Vue 3 + ThinkPHP，从事件流到 Agent Function Calling。', img: '/ky/ky_xtcrm.png', slug: 'xtcrm' },
+          { name: 'B2B 诊断', tag: '基因诊断', desc: '3 道题看清企业专注基因。OpenClaw Skill，自动生成 PDF 诊断报告。', img: '/ky/ky_b2b.png', slug: 'b2b-digital-diagnosis' },
+          { name: '雄韬创作锚', tag: '创作锚', desc: '四锚框架锁定内容结构。5 种隐喻皮肤，6 种输出模式。', img: '/ky/ky_cz.png', slug: 'anchorframe' },
+          { name: '雄韬易经', tag: '64卦决策', desc: '38 卦映射商业场景，中西管理理论交叉验证。', img: '/ky/ky_yj.png', slug: 'yijing' },
+          { name: '企业头条', tag: '公关稿', desc: '18 类别 × 6 行业，自动生成新闻稿 + PNG 海报。', img: '/ky/ky_tt.png', slug: 'company-headlines' },
+        ].map(p => (
+          <a href={`/open/${p.slug}`} style="text-decoration:none;color:inherit;display:block;background:#fff;border:1px solid #eee;overflow:hidden;transition:border-color .2s,box-shadow .2s">
+            <SafeImage src={p.img} alt={p.name} aspect="360/250" />
+            <div style="padding:24px 22px">
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
+                <h3 style="font-size:18px;font-weight:500;color:#000;margin:0">{p.name}</h3>
+                <span style="font-size:11px;color:#999">{p.tag}</span>
+              </div>
+              <p style="font-size:13px;color:#888;line-height:1.7;margin:0">{p.desc}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 最新文章 ===== -->
   {latestPosts.length > 0 && (
     <section style="padding:60px 0;background:#fafafa">
