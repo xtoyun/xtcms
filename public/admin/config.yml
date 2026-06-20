@@ -91,11 +91,25 @@ collections:
     slug: "{{slug}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
+    view_groups:
+      - label: 📌 置顶服务
+        field: pinned
+        pattern: "true"
+      - label: 服务列表
+        field: pinned
+        pattern: "false"
     fields:
       - { label: 服务名称, name: title, widget: string }
       - { label: 图标(emoji), name: icon, widget: string }
       - { label: 描述, name: description, widget: text }
       - { label: 排序, name: order, widget: number, default: 0, value_type: int }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
       - { label: 详情, name: body, widget: markdown, required: false }
 
   - name: pages
@@ -107,8 +121,22 @@ collections:
     summary: "{{title}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
+    view_groups:
+      - label: 📌 置顶页面
+        field: pinned
+        pattern: "true"
+      - label: 页面列表
+        field: pinned
+        pattern: "false"
     fields:
       - { label: 页面标题, name: title, widget: string }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
       - { label: 正文, name: body, widget: markdown }
 
   - name: keywords
@@ -120,9 +148,15 @@ collections:
     summary: "{{keyword}} → {{link}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [date, keyword]
+      default:
+        field: date
+        direction: Descending
     fields:
       - { label: 关键字, name: keyword, widget: string }
       - { label: 链接, name: link, widget: string }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
 
   - name: messages
     label: 留言管理
@@ -132,6 +166,11 @@ collections:
     summary: "{{read | ternary('✅ ', '🆕 ')}}{{name}} — {{date}}"
     editor:
       preview: false
+    sortable_fields:
+      fields: [date, name]
+      default:
+        field: date
+        direction: Descending
     view_groups:
       - label: 🆕 未读留言
         field: read

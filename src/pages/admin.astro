@@ -16,7 +16,7 @@ const folders: Record<string, { path: string; label: string }> = {
 
 const current = folders[type] || folders.posts;
 const dir = path.join(process.cwd(), current.path);
-const items: { slug: string; title: string; date: string }[] = [];
+const items: { slug: string; title: string; date: string; pinned: boolean }[] = [];
 
 if (fs.existsSync(dir)) {
   for (const f of fs.readdirSync(dir)) {
@@ -25,15 +25,23 @@ if (fs.existsSync(dir)) {
     const fm = raw.match(/^---\n([\s\S]*?)\n---/);
     let title = f.replace(/\.(md|yml)$/, '');
     let date = '';
+    let pinned = false;
     if (fm) {
       for (const line of fm[1].split('\n')) {
         const m = line.match(/^(\w+):\s*["']?(.*)["']?$/);
         if (m?.[1] === 'title') title = m[2];
         if (m?.[1] === 'date') date = m[2]?.slice(0, 10);
+        if (m?.[1] === 'pinned') pinned = m[2] === 'true';
       }
     }
-    items.push({ slug: f.replace(/\.(md|yml)$/, ''), title, date });
+    items.push({ slug: f.replace(/\.(md|yml)$/, ''), title, date, pinned });
   }
+  items.sort((a, b) => {
+    // 置顶优先
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    // 再按时间从新到旧
+    return b.date.localeCompare(a.date);
+  });
 }
 ---
 
