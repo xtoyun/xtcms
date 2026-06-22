@@ -1,0 +1,78 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import { getContent } from '$core/content';
+import { autoLinkKeywords } from '$core/auto-link';
+import { marked } from 'marked';
+
+const { slug } = Astro.params;
+const posts = getContent('posts', 'src/content/posts');
+const post = posts.find(p => p.slug === slug);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// If post has an external link, redirect
+if (post.data.link) {
+  return Astro.redirect(post.data.link);
+}
+
+const rawHtml = post.body ? marked.parse(post.body) : '';
+const htmlContent = autoLinkKeywords(rawHtml as string);
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article style="padding: 60px 0;">
+    <div style="max-width: var(--xt-container-width, 800px); margin: 0 auto; padding: 0 40px;">
+      <a href="/posts" style="font-size: 14px; color: var(--xt-muted); text-decoration: none;">← 返回文章列表</a>
+
+      <header style="margin-top: 40px; margin-bottom: 50px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <time style="font-size: 13px; color: var(--xt-muted);">
+            {post.data.date ? new Date(post.data.date).toLocaleDateString('zh-CN') : ''}
+          </time>
+          {Array.isArray(post.data.tags) && post.data.tags.map((tag: string) => (
+            <span style="font-size: 12px; color: var(--xt-muted); background: #f5f5f5; padding: 2px 8px; border-radius: 2px;">{tag}</span>
+          ))}
+        </div>
+        <h1 style="font-size: 34px; font-weight: 400; color: var(--xt-primary); line-height: 1.3; margin-bottom: 16px;">
+          {post.data.title}
+        </h1>
+        {post.data.description && (
+          <p style="font-size: 18px; color: var(--xt-muted); line-height: 1.7; margin: 0;">
+            {post.data.description}
+          </p>
+        )}
+      </header>
+
+      {htmlContent ? (
+        <div class="cms-content" style="font-size: var(--xt-body-size); line-height: 1.9; color: var(--xt-text);"
+          set:html={htmlContent} />
+      ) : (
+        <div style="text-align: center; padding: 40px 0; color: var(--xt-muted);">
+          暂无正文内容
+        </div>
+      )}
+
+      <footer style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #f0f0f0;">
+        <a href="/posts" style="font-size: 14px; color: var(--xt-muted); text-decoration: none;">← 返回文章列表</a>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>
+
+<!-- CMS content styles -->
+<style is:inline>
+  .cms-content h1, .cms-content h2, .cms-content h3 { color: var(--xt-primary); margin-top: 1.5em; margin-bottom: 0.5em; }
+  .cms-content h2 { font-size: 24px; font-weight: 400; }
+  .cms-content h3 { font-size: 20px; font-weight: 400; }
+  .cms-content p { margin-bottom: 1em; }
+  .cms-content img { max-width: 100%; border-radius: 4px; }
+  .cms-content pre { background: #f5f5f5; padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 14px; }
+  .cms-content code { background: #f5f5f5; padding: 2px 6px; border-radius: 2px; font-size: 0.9em; }
+  .cms-content blockquote { border-left: 3px solid var(--xt-primary); padding-left: 16px; margin-left: 0; color: var(--xt-muted); }
+  .cms-content ul, .cms-content ol { padding-left: 1.5em; margin-bottom: 1em; }
+  .cms-content table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+  .cms-content th, .cms-content td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; }
+  .cms-content th { background: #f5f5f5; }
+</style>

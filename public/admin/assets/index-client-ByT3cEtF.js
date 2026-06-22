@@ -1,0 +1,2 @@
+import{Ft as e,It as t,Pt as n,Sr as r,Tt as i,i as a,n as o,o as s,s as c,t as l,v as u,w as d,xr as f,y as p}from"./runtime-DyUlikDz.js";var m=r({get:()=>n,toStore:()=>h});function h(e,n){var r=l,i=o,a=e();let f=t(a,t=>{var n=a!==e(),f,p=o,m=l;c(i),s(r);try{f=u(()=>{d(()=>{let r=e();n&&t(r)})})}finally{c(p),s(m)}return n=!0,f});return n?{set:n,update:t=>n(t(e())),subscribe:f.subscribe}:{subscribe:f.subscribe}}var g=f((()=>{p(),e(),i(),a()}));export{g as n,h as r,m as t};
+//# sourceMappingURL=index-client-ByT3cEtF.js.map

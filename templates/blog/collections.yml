@@ -1,0 +1,147 @@
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    folder: src/content/posts
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
+    view_groups:
+      - label: 置顶文章
+        field: pinned
+        pattern: "true"
+      - label: 文章列表
+        field: pinned
+        pattern: "false"
+    fields:
+      - { label: 标题, name: title, widget: string }
+      - { label: 描述, name: description, widget: text, required: false }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { label: 标签, name: tags, widget: list, required: false, default: [] }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 草稿, name: draft, widget: boolean, default: false }
+      - { label: 外部链接, name: link, widget: string, required: false, hint: "填写后点击标题将跳转到此链接" }
+      - { label: 正文, name: body, widget: markdown }
+
+  - name: pages
+    label: 页面管理
+    label_singular: 页面
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [pinned, date, title]
+      default:
+        field: pinned
+        direction: Descending
+    fields:
+      - { label: 页面标题, name: title, widget: string }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 正文, name: body, widget: markdown }
+
+  - name: keywords
+    label: SEO关键字
+    label_singular: 关键字
+    folder: src/content/keywords
+    create: true
+    slug: "{{slug}}"
+    summary: "{{keyword}} → {{link}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [date, keyword]
+      default:
+        field: date
+        direction: Descending
+    fields:
+      - { label: 关键字, name: keyword, widget: string }
+      - { label: 链接, name: link, widget: string }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+
+  - name: messages
+    label: 留言管理
+    label_singular: 留言
+    folder: src/content/messages
+    create: false
+    summary: "{{name}} — {{date}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [date, name]
+      default:
+        field: date
+        direction: Descending
+    view_groups:
+      - label: 未读留言
+        field: read
+        pattern: "false"
+      - label: 已读留言
+        field: read
+        pattern: "true"
+    fields:
+      - { label: 姓名, name: name, widget: string }
+      - { label: 公司, name: company, widget: string, required: false }
+      - { label: 电话, name: phone, widget: string }
+      - { label: 邮箱, name: email, widget: string, required: false }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, time_format: false }
+      - { label: 已读, name: read, widget: boolean, default: false }
+      - { label: 留言内容, name: body, widget: markdown }
+
+  - name: links
+    label: 友情链接
+    label_singular: 链接
+    folder: src/content/links
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} → {{url}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [order, title]
+      default:
+        field: order
+        direction: Ascending
+    fields:
+      - { label: 网站名称, name: title, widget: string }
+      - { label: 网址, name: url, widget: string }
+      - { label: 描述, name: description, widget: text, required: false }
+      - { label: 排序, name: order, widget: number, default: 0, value_type: int }
+
+settings:
+  - name: general
+    label: 基本信息
+    file: src/content/settings/general.yml
+    fields:
+      - { label: 网站标题, name: site_title, widget: string, required: false }
+      - { label: 网站描述, name: site_description, widget: text, required: false }
+      - { label: 联系邮箱, name: email, widget: string, required: false }
+      - { label: 联系电话, name: phone, widget: string, required: false }
+
+  - name: footer
+    label: 页脚设置
+    file: src/content/settings/footer.yml
+    fields:
+      - { label: ICP备案号, name: icp, widget: string }
+      - { label: 公安备案号, name: police, widget: string, required: false }
+      - { label: 版权文字, name: copyright, widget: string }
+
+  - name: social
+    label: 社交媒体
+    file: src/content/settings/social.yml
+    fields:
+      - { label: GitHub, name: github, widget: string, required: false }
+      - { label: 微信二维码图片, name: wechat_qr, widget: image, required: false }

@@ -1,0 +1,207 @@
+---
+import { getContent, getFileContent } from '$core/content';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+const general = getFileContent('src/content/settings/general.yml') || {};
+const footer = getFileContent('src/content/settings/footer.yml') || {};
+const friendLinks = getContent('links', 'src/content/links')
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+const siteTitle = title
+  ? `${title} - ${general.site_title || 'XTOCN'}`
+  : `${general.site_title || 'XTOCN'} - ${general.site_description || ''}`;
+
+const theme = {
+  primary: general.theme_primary || '#000000',
+  accent: general.theme_accent || '#d4380d',
+  text: general.theme_text || '#333333',
+  muted: general.theme_muted || '#7C7F83',
+  containerWidth: general.theme_container_width || '1200px',
+};
+
+const currentPath = Astro.url.pathname;
+
+// Dynamic pages from collection
+const allPages = getContent('pages', 'src/content/pages').filter(p => !p.data.hidden);
+
+const navItems = [
+  { label: '首页', href: '/' },
+  { label: '项目', href: '/projects' },
+  { label: '服务', href: '/services' },
+  { label: '产品', href: '/products' },
+  { label: '文章', href: '/posts' },
+  ...allPages.map(p => ({ label: p.data.title || p.slug, href: `/${p.slug}` })),
+  { label: '开源', href: '/open' },
+  { label: '联系', href: '/contact' },
+].map(item => ({
+  ...item,
+  active: item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href),
+}));
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{siteTitle}</title>
+  <meta name="description" content={description || general.site_description || ''} />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <Fragment set:html={`<style is:inline>
+    :root {
+      --xt-primary: ${theme.primary};
+      --xt-accent: ${theme.accent};
+      --xt-text: ${theme.text};
+      --xt-muted: ${theme.muted};
+      --xt-container: ${theme.containerWidth};
+    }
+  </style>`} />
+
+  <style is:inline>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: PingFang SC, Microsoft YaHei, Hiragino Sans GB, -apple-system, sans-serif;
+      font-size: 16px; color: var(--xt-text);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--xt-primary); text-decoration: none; }
+    a:hover { opacity: 0.7; }
+    img { max-width: 100%; height: auto; display: block; }
+    .container { max-width: var(--xt-container, 1200px); margin: 0 auto; padding: 0 40px; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 300px; height: 100vh;
+      background: #fff; display: flex; flex-direction: column;
+      padding: 50px 40px; z-index: 40;
+    }
+    .sidebar-logo { width: 80px; height: auto; display: block; margin-bottom: 64px; }
+    .sidebar nav { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .sidebar nav a {
+      font-size: 18px; font-weight: 400; color: #000;
+      text-decoration: none; padding: 6px 0;
+      opacity: 0.45; transition: opacity 0.2s;
+    }
+    .sidebar nav a:hover, .sidebar nav a.active { opacity: 1; font-weight: 600; }
+    .sidebar-links { border-top: 1px solid #eee; padding-top: 20px; margin-top: 8px; }
+    .sidebar-links-title { font-size: 13px; font-weight: 600; color: #999; margin-bottom: 10px; letter-spacing: 1px; }
+    .sidebar-links a { display: block; font-size: 14px; color: var(--xt-muted); text-decoration: none; padding: 3px 0; opacity: 0.6; transition: opacity 0.2s; }
+    .sidebar-links a:hover { opacity: 1; }
+    .sidebar-foot { border-top: 1px solid #eee; padding-top: 20px; font-size: 15px; color: var(--xt-muted); }
+    .sidebar-foot .sf-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .sidebar-foot a { color: var(--xt-muted); }
+
+    /* Main */
+    .main-wrap { margin-left: 300px; min-height: 100vh; display: flex; flex-direction: column; }
+    .main-wrap main { flex: 1; }
+
+    /* Footer */
+    .ftr { background: #fff; color: #999; padding: 40px 0 30px; border-top: 1px solid #eee; }
+    .ftr-inner { max-width: 1200px; margin: 0 auto 20px; padding: 0 40px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; }
+    .ftr-l { font-size: 13px; line-height: 2; }
+    .ftr-l a { color: #999; }
+    .ftr-r { font-size: 13px; line-height: 2; text-align: right; }
+    .ftr-btm { text-align: center; }
+    .ftr-btm a { color: #999; font-size: 13px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; font-size: 14px; padding: 8px 16px; min-height: 36px; border: 1px solid #000; background: #000; color: #fff; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.8; }
+    .btn-outline { background: transparent; color: #000; }
+    .btn-lg { font-size: 16px; padding: 12px 28px; }
+
+    /* Mobile */
+    .mob-hdr { display: none; position: sticky; top: 0; z-index: 50; background: #fff; padding: 0 16px; height: 56px; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
+    .mob-hdr-logo { height: 32px; width: auto; }
+    .mob-hdr-btn { background: none; border: none; padding: 8px; cursor: pointer; color: #000; }
+    .mob-menu { position: fixed; inset: 0; z-index: 60; background: #fff; padding: 24px; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease; }
+    .mob-menu.open { transform: translateX(0); }
+    .mob-menu-close { align-self: flex-end; background: none; border: none; font-size: 28px; cursor: pointer; color: #000; padding: 4px 8px; }
+    .mob-menu nav { display: flex; flex-direction: column; gap: 4px; }
+    .mob-menu nav a { display: block; padding: 12px 0; font-size: 17px; color: #000; text-decoration: none; border-bottom: 1px solid #f0f0f0; opacity: 0.45; }
+    .mob-menu nav a.active-mob { opacity: 1; font-weight: 600; }
+    .mob-menu-foot { margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; font-size: 15px; color: var(--xt-muted); line-height: 2; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-wrap { margin-left: 0; }
+      .mob-hdr { display: flex; }
+      .ftr-inner { flex-direction: column; gap: 16px; }
+      .ftr-r { text-align: left; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar">
+    <a href="/"><img src="/logo.svg" alt="XTOCN" class="sidebar-logo" onerror="this.outerHTML='<span class=sidebar-logo style=font-size:22px;font-weight:700>XTOCN</span>'" /></a>
+    <nav>
+      {navItems.map(item => (
+        <a href={item.href} class={item.active ? 'active' : ''}>{item.label}</a>
+      ))}
+    </nav>
+    {friendLinks.length > 0 && (
+      <div class="sidebar-links">
+        <div class="sidebar-links-title">友情链接</div>
+        {friendLinks.map(link => (
+          <a href={link.data.url} target="_blank" rel="noopener" title={link.data.description || link.data.title}>{link.data.title}</a>
+        ))}
+      </div>
+    )}
+    <div class="sidebar-foot">
+      {general.email && <div class="sf-row">✉️ <a href="mailto:{general.email}">{general.email}</a></div>}
+      {general.phone && <div class="sf-row">📞 <span>{general.phone}</span></div>}
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="mob-hdr">
+    <a href="/"><img src="/logo.svg" alt="XTOCN" class="mob-hdr-logo" /></a>
+    <button class="mob-hdr-btn" id="mob-btn" aria-label="菜单">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+    </button>
+  </header>
+  <div class="mob-menu" id="mob-menu">
+    <button class="mob-menu-close" id="mob-close">&times;</button>
+    <nav>
+      {navItems.map(item => (
+        <a href={item.href} class={item.active ? 'active-mob' : ''}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="mob-menu-foot">
+      {general.email && <p>✉️ {general.email}</p>}
+      {general.phone && <p>📞 {general.phone}</p>}
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-wrap">
+    <main><slot /></main>
+
+    <footer class="ftr">
+      <div class="ftr-inner">
+        <div class="ftr-l">
+          <p>&copy; {new Date().getFullYear()} {general.site_title || 'XTOCN'}. All rights reserved.</p>
+          {footer.icp && <p><a href="https://beian.miit.gov.cn/" target="_blank">{footer.icp}</a></p>}
+          {footer.police && <p><a href="https://beian.mps.gov.cn/" target="_blank">{footer.police}</a></p>}
+        </div>
+        <div class="ftr-r">
+        </div>
+      </div>
+      <div class="ftr-btm"><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">↑ 返回顶部</a></div>
+    </footer>
+  </div>
+
+  <script is:inline>
+    document.getElementById('mob-btn')?.addEventListener('click',()=>document.getElementById('mob-menu')?.classList.add('open'));
+    document.getElementById('mob-close')?.addEventListener('click',()=>document.getElementById('mob-menu')?.classList.remove('open'));
+  </script>
+</body>
+</html>

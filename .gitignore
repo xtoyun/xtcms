@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+.xtcms/pages-bak/
+.env
+src/_template_changed
+public/uploads/

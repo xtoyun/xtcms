@@ -1,0 +1,48 @@
+name: blog
+version: 1.0.0
+type: blog
+label: 博客模板
+description: xtcms 默认博客模板。简洁、轻量、响应式，适合个人博客和内容型网站。
+author: xtcms
+license: MIT
+
+# blog 是根模板，不继承任何模板
+# extends: null
+
+supports:
+  - posts
+  - pages
+
+layouts:
+  homepage: card-grid
+  post: single-column
+  list: with-sidebar
+
+features:
+  - rss
+  - search
+  - dark-mode
+  - responsive
+
+# ── 可配置项 ──
+customizable:
+  colors:
+    - { name: primary, label: 主色调, type: color, default: "#000000" }
+    - { name: bg, label: 背景色, type: color, default: "#ffffff" }
+    - { name: accent, label: 强调色, type: color, default: "#d4380d" }
+    - { name: text, label: 文字色, type: color, default: "#333333" }
+    - { name: muted, label: 辅助文字色, type: color, default: "#7C7F83" }
+
+  typography:
+    - { name: heading_font, label: 标题字体, type: select, options: ["PingFang SC", "Noto Serif SC", "Microsoft YaHei", "思源宋体", "Helvetica Neue"], default: "PingFang SC" }
+    - { name: body_font, label: 正文字体, type: select, options: ["PingFang SC", "Noto Sans SC", "Microsoft YaHei", "System UI"], default: "PingFang SC" }
+    - { name: body_size, label: 正文字号(px), type: number, default: 16, min: 14, max: 20 }
+
+  layout:
+    - { name: container_width, label: 内容区宽度, type: select, options: ["680px", "800px", "960px", "100%"], default: "800px" }
+    - { name: show_sidebar, label: 显示侧边栏, type: boolean, default: true }
+
+requires:
+  xtcms: ">=1.0.0"
+  astro: ">=6.0.0"
+  node: ">=22.0.0"

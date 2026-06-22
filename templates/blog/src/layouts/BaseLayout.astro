@@ -1,0 +1,226 @@
+---
+import { getContent, getFileContent } from '$core/content';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+// Read site settings
+const general = getFileContent('src/content/settings/general.yml') || {};
+const footer = getFileContent('src/content/settings/footer.yml') || {};
+const friendLinks = getContent('links', 'src/content/links')
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+const siteTitle = title
+  ? `${title} - ${general.site_title || 'Blog'}`
+  : `${general.site_title || 'Blog'} - ${general.site_description || ''}`;
+
+// Hardcoded theme defaults (theme.yml customization comes later)
+const theme = {
+  primary: general.theme_primary || '#000000',
+  bg: general.theme_bg || '#ffffff',
+  accent: general.theme_accent || '#d4380d',
+  text: general.theme_text || '#333333',
+  muted: general.theme_muted || '#7C7F83',
+  headingFont: general.theme_heading_font || 'PingFang SC',
+  bodyFont: general.theme_body_font || 'PingFang SC',
+  bodySize: general.theme_body_size || '16',
+  containerWidth: general.theme_container_width || '800px',
+};
+
+// Navigation — dynamic pages from the pages collection
+const currentPath = Astro.url.pathname;
+const allPages = getContent('pages', 'src/content/pages');
+const dynamicNavItems = allPages
+  .filter(p => !p.data.hidden) // skip hidden pages
+  .map(p => ({
+    label: p.data.title || p.slug,
+    href: `/${p.slug}`,
+  }));
+
+const navItems = [
+  { label: '首页', href: '/' },
+  { label: '文章', href: '/posts' },
+  { label: '留言', href: '/contact' },
+  ...dynamicNavItems,
+].map(item => ({
+  ...item,
+  active: item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href),
+}));
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{siteTitle}</title>
+  <meta name="description" content={description || general.site_description || 'A blog powered by xtcms'} />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <!-- Theme CSS variables (set:html for dynamic values) -->
+  <Fragment set:html={`<style is:inline>
+    :root {
+      --xt-primary: ${theme.primary};
+      --xt-bg: ${theme.bg};
+      --xt-accent: ${theme.accent};
+      --xt-text: ${theme.text};
+      --xt-muted: ${theme.muted};
+      --xt-heading-font: ${theme.headingFont};
+      --xt-body-font: ${theme.bodyFont};
+      --xt-body-size: ${theme.bodySize}px;
+      --xt-container-width: ${theme.containerWidth};
+    }
+  </style>`} />
+
+  <style is:inline>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--xt-body-font), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: var(--xt-body-size);
+      color: var(--xt-text);
+      background: var(--xt-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--xt-primary); text-decoration: none; }
+    a:hover { opacity: 0.7; }
+    img { max-width: 100%; height: auto; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0;
+      width: 280px; height: 100vh;
+      background: var(--xt-bg);
+      display: flex; flex-direction: column;
+      padding: 50px 36px;
+      z-index: 40;
+      border-right: 1px solid #f0f0f0;
+    }
+    .sidebar-logo { font-size: 22px; font-weight: 700; color: var(--xt-primary); margin-bottom: 56px; }
+    .sidebar nav { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar nav a {
+      font-size: 17px; font-weight: 400;
+      color: var(--xt-text); text-decoration: none;
+      padding: 8px 0; opacity: 0.45; transition: opacity 0.2s;
+    }
+    .sidebar nav a:hover, .sidebar nav a.active { opacity: 1; font-weight: 600; }
+    .sidebar-links { border-top: 1px solid #f0f0f0; padding-top: 16px; margin-top: 4px; }
+    .sidebar-links-title { font-size: 12px; font-weight: 600; color: #bbb; margin-bottom: 8px; letter-spacing: 1px; }
+    .sidebar-links a { display: block; font-size: 13px; color: var(--xt-muted); text-decoration: none; padding: 2px 0; opacity: 0.5; transition: opacity 0.2s; }
+    .sidebar-links a:hover { opacity: 0.8; }
+    .sidebar-foot { border-top: 1px solid #f0f0f0; padding-top: 20px; font-size: 14px; color: var(--xt-muted); }
+    .sidebar-foot .sf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+
+    /* Main area */
+    .main-wrap { margin-left: 280px; min-height: 100vh; display: flex; flex-direction: column; }
+    .main-wrap main { flex: 1; }
+
+    /* Mobile header */
+    .mob-hdr {
+      display: none; position: sticky; top: 0; z-index: 50;
+      background: var(--xt-bg); padding: 0 16px; height: 56px;
+      align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .mob-hdr-logo { font-size: 18px; font-weight: 700; color: var(--xt-primary); }
+    .mob-hdr-btn { background: none; border: none; padding: 8px; cursor: pointer; color: var(--xt-text); }
+    .mob-menu {
+      position: fixed; inset: 0; z-index: 60; background: var(--xt-bg);
+      padding: 24px; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform 0.3s ease;
+    }
+    .mob-menu.open { transform: translateX(0); }
+    .mob-menu-close { align-self: flex-end; background: none; border: none; font-size: 28px; cursor: pointer; color: var(--xt-text); padding: 4px 8px; }
+    .mob-menu nav { display: flex; flex-direction: column; gap: 4px; }
+    .mob-menu nav a { display: block; padding: 14px 0; font-size: 17px; color: var(--xt-text); text-decoration: none; border-bottom: 1px solid #f0f0f0; opacity: 0.45; }
+    .mob-menu nav a.active-mob { opacity: 1; font-weight: 600; }
+    .mob-menu-foot { margin-top: auto; padding-top: 20px; border-top: 1px solid #f0f0f0; font-size: 15px; color: var(--xt-muted); line-height: 2; }
+
+    /* Footer */
+    .ftr {
+      background: var(--xt-bg); color: var(--xt-muted);
+      padding: 40px 0 30px; border-top: 1px solid #f0f0f0;
+      text-align: center; font-size: 13px;
+    }
+    .ftr a { color: var(--xt-muted); }
+    .ftr-inner { max-width: 960px; margin: 0 auto 16px; padding: 0 40px; line-height: 2; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-wrap { margin-left: 0; }
+      .mob-hdr { display: flex; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar">
+    <a href="/" class="sidebar-logo">{general.site_title || 'Blog'}</a>
+    <nav>
+      {navItems.map(item => (
+        <a href={item.href} class={item.active ? 'active' : ''}>{item.label}</a>
+      ))}
+    </nav>
+    {friendLinks.length > 0 && (
+      <div class="sidebar-links">
+        <div class="sidebar-links-title">友情链接</div>
+        {friendLinks.map(link => (
+          <a href={link.data.url} target="_blank" rel="noopener">{link.data.title}</a>
+        ))}
+      </div>
+    )}
+    <div class="sidebar-foot">
+      {general.email && <div class="sf-row">✉️ {general.email}</div>}
+      {general.phone && <div class="sf-row">📞 {general.phone}</div>}
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="mob-hdr">
+    <a href="/" class="mob-hdr-logo">{general.site_title || 'Blog'}</a>
+    <button class="mob-hdr-btn" id="mob-btn" aria-label="菜单">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+    </button>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mob-menu" id="mob-menu">
+    <button class="mob-menu-close" id="mob-close">&times;</button>
+    <nav>
+      {navItems.map(item => (
+        <a href={item.href} class={item.active ? 'active-mob' : ''}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="mob-menu-foot">
+      {general.email && <p>✉️ {general.email}</p>}
+      {general.phone && <p>📞 {general.phone}</p>}
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-wrap">
+    <main><slot /></main>
+
+    <footer class="ftr">
+      <div class="ftr-inner">
+        <p>&copy; {new Date().getFullYear()} {footer.copyright || general.site_title || 'Blog'}. All rights reserved.</p>
+        {footer.icp && <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{footer.icp}</a></p>}
+        {footer.police && <p><a href="https://beian.mps.gov.cn/" target="_blank" rel="nofollow">{footer.police}</a></p>}
+              </div>
+    </footer>
+  </div>
+
+  <script is:inline>
+    document.getElementById('mob-btn')?.addEventListener('click', function() {
+      document.getElementById('mob-menu')?.classList.add('open');
+    });
+    document.getElementById('mob-close')?.addEventListener('click', function() {
+      document.getElementById('mob-menu')?.classList.remove('open');
+    });
+  </script>
+</body>
+</html>

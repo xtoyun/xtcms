@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xtcms Admin</title>
+  <link href="/admin/config.yml" type="application/yaml" rel="cms-config-url">
+</head>
+<body>
+  <script>
+    // Polyfill for crypto.randomUUID()
+    if (!globalThis.crypto?.randomUUID) {
+      globalThis.crypto.randomUUID = function() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+    }
+    // Polyfill for crypto.subtle.digest (needed in non-secure contexts e.g. network IP access)
+    if (!globalThis.crypto?.subtle?.digest) {
+      if (!globalThis.crypto.subtle) {
+        globalThis.crypto.subtle = {};
+      }
+      // Simple async hash fallback for self-hosted environments
+      crypto.subtle.digest = async function(algorithm, data) {
+        // Convert input to string and create a simple hash
+        const str = typeof data === 'string' ? data :
+          data instanceof Uint8Array ? String.fromCharCode(...data) :
+          String(data);
+        let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+        for (let i = 0; i < str.length; i++) {
+          const ch = str.charCodeAt(i);
+          h1 = Math.imul(h1 ^ ch, 2654435761);
+          h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        const hash = new Uint8Array(32);
+        const dv = new DataView(hash.buffer);
+        dv.setUint32(0, h1 >>> 0, false);
+        dv.setUint32(4, h2 >>> 0, false);
+        dv.setUint32(8, (h1 ^ h2) >>> 0, false);
+        return hash.buffer;
+      };
+    }
+  </script>
+  <script src="/admin/sveltia-cms.js"></script>
+  <script>
+    setInterval(() => { if (document.title !== 'xtcms Admin') document.title = 'xtcms Admin'; }, 500);
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import { getFileContent } from '$core/content';
+const general = getFileContent('src/content/settings/general.yml') || {};
+---
+<BaseLayout title="联系我们">
+  <section style="padding:60px 0">
+    <div class="container" style="max-width:600px">
+      <h1 style="font-size:34px;font-weight:400;color:#000;margin-bottom:0.3em">联系<span style="font-weight:300">我们</span></h1>
+      <p style="font-size:16px;color:var(--xt-muted);margin-bottom:50px">期待与您的合作</p>
+
+      <div style="margin-bottom:40px">
+        <h3 style="font-size:18px;font-weight:500;margin-bottom:16px">联系方式</h3>
+        <div style="display:grid;gap:20px">
+          {general.email && <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">✉️</span><a href="mailto:{general.email}" style="font-size:16px;color:var(--xt-primary)">{general.email}</a></div>}
+          {general.phone && <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📞</span><span style="font-size:16px">{general.phone}</span></div>}
+        </div>
+      </div>
+
+      <form method="POST" action="/api/contact" style="display:grid;gap:20px">
+        <input name="name" placeholder="姓名 *" required style="padding:12px 16px;border:1px solid #ddd;font-size:16px;width:100%" />
+        <input name="company" placeholder="公司" style="padding:12px 16px;border:1px solid #ddd;font-size:16px;width:100%" />
+        <input name="phone" placeholder="电话 *" required style="padding:12px 16px;border:1px solid #ddd;font-size:16px;width:100%" />
+        <input name="email" placeholder="邮箱" type="email" style="padding:12px 16px;border:1px solid #ddd;font-size:16px;width:100%" />
+        <textarea name="message" placeholder="留言内容" rows="5" style="padding:12px 16px;border:1px solid #ddd;font-size:16px;width:100%;resize:vertical"></textarea>
+        <button type="submit" class="btn btn-lg" style="justify-self:start">发送留言</button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>

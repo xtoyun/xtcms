@@ -1,0 +1,42 @@
+name: xtocn
+version: 1.0.0
+type: enterprise
+label: 雄韬企业站模板
+description: xtocn 企业官网模板。侧边栏导航、案例展示、服务体系、浮动联系栏，适合企业品牌官网。
+author: xtcms
+license: MIT
+
+extends: blog
+
+supports:
+  - posts
+  - pages
+  - projects
+  - services
+
+layouts:
+  homepage: hero-featured
+  post: sidebar
+  project: cover-image
+  service: icon-detail
+
+features:
+  - rss
+  - responsive
+  - floating-contact
+
+customizable:
+  colors:
+    - { name: primary, label: 主色调, type: color, default: "#000000" }
+    - { name: accent, label: 强调色, type: color, default: "#d4380d" }
+    - { name: text, label: 文字色, type: color, default: "#333333" }
+    - { name: muted, label: 辅助色, type: color, default: "#7C7F83" }
+
+  typography:
+    - { name: heading_font, label: 标题字体, type: select, options: ["PingFang SC", "Noto Serif SC", "Microsoft YaHei"], default: "PingFang SC" }
+
+  layout:
+    - { name: container_width, label: 内容区宽度, type: select, options: ["900px", "1100px", "1200px"], default: "1200px" }
+
+requires:
+  xtcms: ">=1.0.0"

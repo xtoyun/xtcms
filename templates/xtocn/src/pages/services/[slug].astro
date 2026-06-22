@@ -1,0 +1,36 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import { getContent } from '$core/content';
+import { marked } from 'marked';
+
+const { slug } = Astro.params;
+const services = getContent('services', 'src/content/services');
+const service = services.find(s => s.slug === slug);
+if (!service) return Astro.redirect('/services');
+const htmlBody = service.body ? marked.parse(service.body) : '';
+---
+<BaseLayout title={service.data.title} description={service.data.description}>
+  <section style="padding:60px 0">
+    <div class="container" style="max-width:800px">
+      <a href="/services" style="font-size:14px;color:var(--xt-muted)">← 返回服务列表</a>
+      <header style="margin-top:40px;margin-bottom:50px">
+        {service.data.image && <img src={service.data.image} alt={service.data.title} style="width:100%;max-height:400px;object-fit:cover;margin-bottom:30px" />}
+        <h1 style="font-size:34px;font-weight:400;color:#000;margin-bottom:16px">{service.data.title}</h1>
+        <p style="font-size:18px;font-weight:300;color:var(--xt-muted);line-height:1.8">{service.data.description}</p>
+      </header>
+      {htmlBody ? (
+        <div class="cms-content" set:html={htmlBody} />
+      ) : (
+        <p style="text-align:center;padding:60px;color:#aaa">详细内容即将更新</p>
+      )}
+      <footer style="margin-top:60px;padding-top:30px;border-top:1px solid #eee">
+        <a href="/services" style="font-size:14px;color:var(--xt-muted)">← 返回服务列表</a>
+      </footer>
+    </div>
+  </section>
+</BaseLayout>
+<style is:inline>
+  .cms-content h2 { font-size:24px;font-weight:400;margin-top:1.5em;margin-bottom:0.5em;color:#000; }
+  .cms-content p { margin-bottom:1em;line-height:1.9; }
+  .cms-content img { max-width:100%;border-radius:4px; }
+</style>

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import { getContent } from '$core/content';
+
+const posts = getContent('posts', 'src/content/posts')
+  .filter(p => !p.data.draft);
+---
+
+<BaseLayout title="文章">
+  <section style="padding: 60px 0;">
+    <div style="max-width: var(--xt-container-width, 800px); margin: 0 auto; padding: 0 40px;">
+      <h1 style="font-size: 34px; font-weight: 400; color: var(--xt-primary); margin-bottom: 0.3em;">
+        文章
+      </h1>
+      <p style="font-size: 16px; color: var(--xt-muted); margin-bottom: 48px;">
+        共 {posts.length} 篇文章
+      </p>
+
+      {posts.length > 0 ? (
+        <div style="display: grid; gap: 32px;">
+          {posts.map(post => (
+            <article style="padding-bottom: 32px; border-bottom: 1px solid #f0f0f0;">
+              <a href={post.data.link || `/posts/${post.slug}`} style="text-decoration: none; color: inherit; display: flex; gap: 24px;">
+                {post.data.image && (
+                  <div style="flex-shrink:0;width:200px;aspect-ratio:16/10;overflow:hidden;border-radius:4px">
+                    <img src={post.data.image} alt={post.data.title} style="width:100%;height:100%;object-fit:cover" />
+                  </div>
+                )}
+                <div style="flex:1;min-width:0">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    {post.data.pinned && <span style="font-size: 10px; color: var(--xt-accent); background: #fff2e8; border: 1px solid #ffbb96; padding: 1px 6px; border-radius: 2px; font-weight: 500;">置顶</span>}
+                    <time style="font-size: 13px; color: var(--xt-muted);">
+                      {post.data.date ? new Date(post.data.date).toLocaleDateString('zh-CN') : ''}
+                    </time>
+                  </div>
+                  <h2 style="font-size: 22px; font-weight: 500; color: var(--xt-primary); margin-bottom: 8px; line-height: 1.4;">
+                    {post.data.title}
+                  </h2>
+                  {post.data.description && (
+                    <p style="font-size: 15px; color: var(--xt-muted); line-height: 1.6; margin: 0;">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div style="text-align: center; padding: 60px 0; color: var(--xt-muted);">
+          还没有文章
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

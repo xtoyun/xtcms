@@ -1,0 +1,125 @@
+# xtocn 模板新增的 collections（posts + pages 从 blog 继承）
+collections:
+  - name: projects
+    label: 项目案例
+    label_singular: 项目
+    folder: src/content/projects
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}} — {{category}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [featured, date, title]
+      default:
+        field: featured
+        direction: Descending
+    view_groups:
+      - label: 精选项目
+        field: featured
+        pattern: "true"
+      - label: 项目列表
+        field: featured
+        pattern: "false"
+    fields:
+      - { label: 项目名称, name: title, widget: string }
+      - { label: 描述, name: description, widget: text }
+      - { label: 分类, name: category, widget: select, options: ["品牌建设", "网站建设", "网络营销", "自媒体", "数字化管理"] }
+      - { label: 客户, name: client, widget: string, required: false }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 精选项目, name: featured, widget: boolean, default: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 链接, name: link, widget: string, required: false }
+      - { label: 正文, name: body, widget: markdown, required: false }
+
+  - name: services
+    label: 服务项目
+    label_singular: 服务
+    folder: src/content/services
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [order, title]
+      default:
+        field: order
+        direction: Ascending
+    fields:
+      - { label: 服务名称, name: title, widget: string }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 描述, name: description, widget: text }
+      - { label: 排序, name: order, widget: number, default: 0, value_type: int }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 详情, name: body, widget: markdown, required: false }
+
+  - name: products
+    label: 产品管理
+    label_singular: 产品
+    folder: src/content/products
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}} — {{category}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [featured, date, title]
+      default:
+        field: featured
+        direction: Descending
+    view_groups:
+      - label: 精选产品
+        field: featured
+        pattern: "true"
+      - label: 产品列表
+        field: featured
+        pattern: "false"
+    fields:
+      - { label: 产品名称, name: title, widget: string }
+      - { label: 描述, name: description, widget: text }
+      - { label: 分类, name: category, widget: select, options: ["硬件产品", "软件产品", "服务产品", "其他"] }
+      - { label: 价格, name: price, widget: string, required: false }
+      - { label: 日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 精选, name: featured, widget: boolean, default: false }
+      - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 详情, name: body, widget: markdown, required: false }
+
+  - name: opensource
+    label: 开源项目
+    label_singular: 项目
+    folder: src/content/opensource
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}} — {{tag}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [order, title]
+      default:
+        field: order
+        direction: Ascending
+    fields:
+      - { label: 项目名称, name: title, widget: string }
+      - { label: 标签, name: tag, widget: string }
+      - { label: 描述, name: description, widget: text }
+      - { label: 封面图, name: image, widget: image, required: false }
+      - { label: 链接, name: link, widget: string, required: false }
+      - { label: 排序, name: order, widget: number, default: 0, value_type: int }
+
+settings:
+  - name: homepage
+    label: 首页设置
+    file: src/content/settings/homepage.yml
+    fields:
+      - { label: 首页大标题, name: hero_title, widget: string, default: "打造网络品牌" }
+      - { label: 首页副标题, name: hero_subtitle, widget: string, default: "把生意服务到全世界" }
+      - { label: 首页标语, name: hero_tagline, widget: string, default: "网络营销品牌" }
+      - { label: 关于标题, name: about_title, widget: string, default: "Hello! 我们是雄韬网络." }
+      - { label: 关于描述, name: about_desc, widget: text, default: "15年互联网营销品牌，用最新的技术和趋势，为您的企业提供现代设计与开发，把生意服务到全世界。" }
+      - { label: 展示案例数量, name: projects_count, widget: number, default: 3, value_type: int }
