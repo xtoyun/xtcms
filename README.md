@@ -278,6 +278,12 @@ xtcms 是雄韬 XTOCN 开源家族的核心项目：
 
 ---
 
+## 文档
+
+完整文档：**[https://doc.xtocn.com/docs/overview](https://doc.xtocn.com/docs/overview)**
+
+包含概述、快速开始、核心概念、内容管理、模板系统、模板开发、API 接口、部署运维、常见问题。
+
 ## License
 
 Apache-2.0 © 2026 XTOCN Open Source Contributors

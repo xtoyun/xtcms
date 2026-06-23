@@ -22,6 +22,7 @@ const pages = defineCollection({
     date: z.coerce.string().optional(),
     image: z.string().optional(),
     pinned: z.boolean().optional().default(false),
+    video: z.string().optional(),
   }),
 });
 
@@ -56,13 +57,4 @@ const links = defineCollection({
   }),
 });
 
-const docs = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/docs' }),
-  schema: z.object({
-    title: z.string(),
-    order: z.number().optional(),
-    parent: z.string().optional(),
-  }),
-});
-
-export const collections = { posts, pages, keywords, messages, links, docs };
+export const collections = { posts, pages, keywords, messages, links };

@@ -8,7 +8,7 @@ collections:
     slug: "{{fields._slug}}"
     summary: "{{title}} — {{date | date('YYYY-MM-DD')}}"
     editor:
-      preview: false
+      preview: true
     sortable_fields:
       fields: [pinned, date, title]
       default:
@@ -39,6 +39,7 @@ collections:
     create: true
     slug: "{{slug}}"
     summary: "{{title}}"
+    view_type: grid
     editor:
       preview: false
     sortable_fields:
@@ -51,6 +52,7 @@ collections:
       - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
       - { label: 封面图, name: image, widget: image, required: false }
       - { label: 置顶, name: pinned, widget: boolean, default: false }
+      - { label: 视频, name: video, widget: string, required: false, hint: "B站/YouTube嵌入iframe代码 或 MP4地址" }
       - { label: 正文, name: body, widget: markdown }
 
   - name: keywords

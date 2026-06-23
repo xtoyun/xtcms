@@ -1,1 +1,7 @@
-{"name":"docs","chain":["blog","docs"],"activatedAt":"2026-06-22T00:00:00.000Z"}
+{
+  "name": "blog",
+  "chain": [
+    "blog"
+  ],
+  "activatedAt": "2026-06-23T09:30:26.559Z"
+}
