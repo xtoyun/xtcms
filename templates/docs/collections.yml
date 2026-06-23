@@ -17,7 +17,7 @@ collections:
     fields:
       - { label: 标题, name: title, widget: string }
       - { label: 排序, name: order, widget: number, default: 0, value_type: int, hint: "数字越小越靠前" }
-      - { label: 父级, name: parent, widget: string, required: false, hint: "留空为顶级，填父文档 slug 建立上下级" }
+      - { label: 父级, name: parent, widget: relation, collection: docs, value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"], required: false, hint: "留空为顶级文档" }
       - { label: 正文, name: body, widget: markdown }
 
 settings:
