@@ -4,6 +4,7 @@ order: 2
 parent: getting-started
 ---
 
+
 ## 环境要求
 
 - Node.js >= 22
