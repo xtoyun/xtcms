@@ -15,6 +15,8 @@ import path from 'node:path';
 export function templateChainPlugin() {
   const CWD = process.cwd();
   const PAGES_DIR = path.join(CWD, 'src', 'pages');
+  const LAYOUTS_DIR = path.join(CWD, 'src', 'layouts');
+  const COMPONENTS_DIR = path.join(CWD, 'src', 'components');
   const PAGES_BAK_DIR = path.join(CWD, '.xtcms', 'pages-bak');
 
   let resolvedLayoutsDir = '';
@@ -135,6 +137,20 @@ export function templateChainPlugin() {
     const overridesPages = path.join(CWD, '.xtcms', 'overrides', 'src', 'pages');
     if (fs.existsSync(overridesPages)) {
       copyDir(overridesPages, PAGES_DIR);
+    }
+
+    // Sync layouts from template chain to src/layouts/
+    if (fs.existsSync(LAYOUTS_DIR)) {
+      fs.rmSync(LAYOUTS_DIR, { recursive: true, force: true });
+    }
+    for (const tplName of chain) {
+      const tplDir = getTemplateDir(tplName);
+      if (tplDir) {
+        const tplLayouts = path.join(tplDir, 'src', 'layouts');
+        if (fs.existsSync(tplLayouts)) {
+          copyDir(tplLayouts, LAYOUTS_DIR);
+        }
+      }
     }
   }
 
@@ -326,8 +342,22 @@ export function templateChainPlugin() {
       // Generate content.config.ts
       generateContentConfigSync();
 
-      // Store for resolveId hook
-      return {};
+      // Set up Vite aliases for template resolution
+      // Must modify config.resolve.alias directly for Vite 8 compatibility
+      if (!config.resolve) config.resolve = {};
+      if (!config.resolve.alias) config.resolve.alias = [];
+
+      if (resolvedLayoutsDir) {
+        config.resolve.alias.push({ find: '$layouts', replacement: resolvedLayoutsDir + '/' });
+      }
+      if (resolvedComponentsDir) {
+        config.resolve.alias.push({ find: '$template', replacement: resolvedComponentsDir + '/' });
+      }
+      config.resolve.alias.push({ find: '$core', replacement: path.join(CWD, 'src', 'core') + '/' });
+
+      console.log('[xtcms] Aliases set:', resolvedLayoutsDir ? 'layouts ✓' : 'layouts ✗', resolvedComponentsDir ? 'components ✓' : 'components ✗');
+
+      return config;
     },
 
     resolveId(id) {

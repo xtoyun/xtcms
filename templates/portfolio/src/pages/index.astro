@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContent, getFileContent } from '../core/content';
+
+const homepage = getFileContent('src/content/settings/homepage.yml') || {};
+const featuredWorks = getContent('works', 'src/content/works')
+  .filter(w => w.data.featured)
+  .slice(0, homepage.works_count || 6);
+const testimonials = getContent('testimonials', 'src/content/testimonials')
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
+  .slice(0, 3);
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section style="padding: 120px 0 80px; text-align: center; max-width: 700px; margin: 0 auto; padding-left: 40px; padding-right: 40px;">
+    <h1 style="font-size: 56px; font-weight: 300; color: var(--xt-primary); line-height: 1.15; margin-bottom: 0;">
+      {homepage.hero_title || 'I design & build'}
+    </h1>
+    <p style="font-size: 56px; font-weight: 300; color: var(--xt-muted); line-height: 1.15; margin: 0 0 32px 0;">
+      {homepage.hero_subtitle || 'digital experiences.'}
+    </p>
+    <p style="font-size: 18px; color: var(--xt-muted); line-height: 1.8; max-width: 500px; margin: 0 auto 40px;">
+      {homepage.about_text || 'A designer and developer passionate about creating beautiful, functional work.'}
+    </p>
+    <a href="/works" style="display: inline-block; padding: 14px 40px; background: var(--xt-primary); color: #fff; text-decoration: none; font-size: 15px; border-radius: 4px;">
+      View my work
+    </a>
+  </section>
+
+  <!-- Featured Works -->
+  {featuredWorks.length > 0 && (
+    <section style="padding: 60px 0; max-width: 1200px; margin: 0 auto; padding-left: 40px; padding-right: 40px;">
+      <h2 style="font-size: 12px; font-weight: 600; color: var(--xt-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 32px;">
+        Selected Work
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+        {featuredWorks.map(w => (
+          <a href={`/works/${w.slug}`} style="text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden; border-radius: 2px;">
+            <div style="aspect-ratio: 4/3; background: #e8e8e8; overflow: hidden;">
+              {w.data.image ? (
+                <img src={w.data.image} alt={w.data.title} style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s;" />
+              ) : (
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 48px;">?</div>
+              )}
+            </div>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: #fff;">
+              <span style="font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">{w.data.category}</span>
+              <h3 style="font-size: 18px; font-weight: 500; margin-top: 4px;">{w.data.title}</h3>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div style="text-align: center; margin-top: 40px;">
+        <a href="/works" style="font-size: 14px; color: var(--xt-muted); text-decoration: none; border-bottom: 1px solid var(--xt-muted); padding-bottom: 4px;">
+          View all work →
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- Testimonials -->
+  {testimonials.length > 0 && (
+    <section style="padding: 80px 0; background: var(--xt-primary); color: #fff; text-align: center;">
+      <div style="max-width: 800px; margin: 0 auto; padding: 0 40px;">
+        <h2 style="font-size: 12px; font-weight: 600; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;">
+          What clients say
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+          {testimonials.map(t => (
+            <div>
+              <p style="font-size: 16px; line-height: 1.8; opacity: 0.9; font-style: italic; margin-bottom: 20px;">
+                "{t.data.quote}"
+              </p>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                {t.data.avatar && <img src={t.data.avatar} alt={t.data.name} style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" />}
+                <div style="text-align: left;">
+                  <div style="font-size: 14px; font-weight: 600;">{t.data.name}</div>
+                  {t.data.company && <div style="font-size: 12px; opacity: 0.6;">{t.data.company}</div>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA -->
+  <section style="padding: 100px 0; text-align: center; max-width: 500px; margin: 0 auto; padding-left: 40px; padding-right: 40px;">
+    <h2 style="font-size: 32px; font-weight: 300; color: var(--xt-primary); margin-bottom: 16px;">
+      Let's work together
+    </h2>
+    <p style="font-size: 16px; color: var(--xt-muted); margin-bottom: 32px; line-height: 1.8;">
+      Have a project in mind? I'd love to hear about it.
+    </p>
+    <a href="/contact" style="display: inline-block; padding: 14px 40px; border: 1px solid var(--xt-primary); color: var(--xt-primary); text-decoration: none; font-size: 15px; border-radius: 4px;">
+      Get in touch
+    </a>
+  </section>
+</BaseLayout>

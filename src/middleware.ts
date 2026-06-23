@@ -23,9 +23,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // ── Dynamic CMS config ──
   if (url.pathname === '/admin/config.yml') {
     try {
-      const yaml = generateCMSConfig();
+      const yaml = generateCMSConfig(undefined, context.request);
       return new Response(yaml, {
-        headers: { 'Content-Type': 'application/yaml; charset=utf-8' },
+        headers: { 'Content-Type': 'application/yaml; charset=utf-8', 'Cache-Control': 'no-cache' },
       });
     } catch (e: any) {
       return new Response(`# Config generation error\n# ${e.message}`, {
@@ -52,7 +52,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const indexPath = path.join(process.cwd(), 'public/admin/index.html');
     if (fs.existsSync(indexPath)) {
       return new Response(fs.readFileSync(indexPath, 'utf8'), {
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' },
       });
     }
     return new Response('CMS not built. Run: cd sveltia-cms && pnpm build', { status: 404 });

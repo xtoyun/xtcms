@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import { getFileContent } from '$core/content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getFileContent } from '../core/content';
 const general = getFileContent('src/content/settings/general.yml') || {};
 ---
 <BaseLayout title="联系我们">

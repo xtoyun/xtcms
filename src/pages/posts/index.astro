@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import { getContent } from '$core/content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent } from '../../core/content';
 
 const posts = getContent('posts', 'src/content/posts')
   .filter(p => !p.data.draft);

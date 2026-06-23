@@ -1,5 +1,6 @@
 ---
-import { getContent, getFileContent } from '$core/content';
+import { getContent, getFileContent } from '../core/content';
+import { t, getFrontendLocale } from '../core/i18n-frontend';
 
 export interface Props {
   title?: string;
@@ -7,6 +8,7 @@ export interface Props {
 }
 
 const { title, description } = Astro.props;
+const locale = getFrontendLocale(Astro.request);
 
 // Read site settings
 const general = getFileContent('src/content/settings/general.yml') || {};
@@ -41,9 +43,9 @@ const dynamicNavItems = allPages
   }));
 
 const navItems = [
-  { label: '首页', href: '/' },
-  { label: '文章', href: '/posts' },
-  { label: '留言', href: '/contact' },
+  { label: t('首页', locale), href: '/' },
+  { label: t('文章', locale), href: '/posts' },
+  { label: t('留言', locale), href: '/contact' },
   ...dynamicNavItems,
 ].map(item => ({
   ...item,
@@ -207,7 +209,7 @@ const navItems = [
 
     <footer class="ftr">
       <div class="ftr-inner">
-        <p>&copy; {new Date().getFullYear()} {footer.copyright || general.site_title || 'Blog'}. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} {footer.copyright || general.site_title || 'Blog'}</p>
         {footer.icp && <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{footer.icp}</a></p>}
         {footer.police && <p><a href="https://beian.mps.gov.cn/" target="_blank" rel="nofollow">{footer.police}</a></p>}
               </div>

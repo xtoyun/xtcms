@@ -5,10 +5,25 @@
   <meta name="robots" content="noindex" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>xtcms Admin</title>
-  <link href="/admin/config.yml" type="application/yaml" rel="cms-config-url">
+  <link href="/admin/config.yml?locale=zh" type="application/yaml" rel="cms-config-url" id="cms-config-link">
 </head>
 <body>
   <script>
+    // Read Sveltia CMS locale from its own prefs storage
+    (function() {
+      var lang = 'zh';
+      try {
+        var raw = localStorage.getItem('sveltia-cms.prefs');
+        if (raw) {
+          var prefs = JSON.parse(raw);
+          if (prefs.locale === 'en' || prefs.locale === 'zh') lang = prefs.locale;
+        }
+      } catch(e) {}
+      // Set cookie so frontend pages follow same locale
+      document.cookie = 'xtcms-locale=' + lang + ';path=/;max-age=31536000';
+      var link = document.getElementById('cms-config-link');
+      if (link) link.href = '/admin/config.yml?locale=' + lang;
+    })();
     // Polyfill for crypto.randomUUID()
     if (!globalThis.crypto?.randomUUID) {
       globalThis.crypto.randomUUID = function() {

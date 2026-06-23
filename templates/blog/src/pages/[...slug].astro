@@ -1,13 +1,13 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import { getContent } from '$core/content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContent } from '../core/content';
 import { marked } from 'marked';
 
 const { slug } = Astro.params;
 const pageSlug = slug || 'index';
 
 // Skip known collection routes — let dedicated pages handle them
-const knownRoutes = ['projects', 'services', 'products', 'posts', 'contact', 'admin', 'api', 'open'];
+const knownRoutes = ['projects', 'services', 'products', 'posts', 'contact', 'admin', 'api', 'open', 'works'];
 if (knownRoutes.includes(pageSlug)) {
   return Astro.redirect('/404');
 }

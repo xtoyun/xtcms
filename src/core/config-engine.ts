@@ -7,6 +7,7 @@ import {
   type CustomizableConfig,
 } from './template-registry';
 import { load as parseYAML } from 'js-yaml';
+import { getLocale, translateConfig } from './i18n';
 
 /**
  * Simple YAML stringifier. Handles the config.yml structure we need.
@@ -93,7 +94,7 @@ const CORE_CONFIG = {
 /**
  * Generate the complete Sveltia CMS config.yml by merging the template chain.
  */
-export function generateCMSConfig(templateName?: string): string {
+export function generateCMSConfig(templateName?: string, request?: Request): string {
   const activeName = templateName || resolveTemplateChain()[resolveTemplateChain().length - 1];
   const chain = resolveTemplateChain(activeName);
 
@@ -197,7 +198,10 @@ export function generateCMSConfig(templateName?: string): string {
     });
   }
 
-  return stringifyYAML(config);
+  // Apply i18n label translation based on browser language (same as CMS UI)
+  const locale = getLocale(request);
+  const localized = locale !== 'zh' ? translateConfig(config, locale) : config;
+  return stringifyYAML(localized);
 }
 
 function customizableToFields(customizable: CustomizableConfig): any[] {

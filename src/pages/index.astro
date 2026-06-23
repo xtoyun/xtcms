@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import { getContent, getFileContent } from '$core/content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContent, getFileContent } from '../core/content';
 
 const homepage = getFileContent('src/content/settings/homepage.yml') || {};
 const featuredProjects = getContent('projects', 'src/content/projects')

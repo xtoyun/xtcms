@@ -169,7 +169,6 @@ export function invalidateTemplateCache(): void {
 // ── Template file resolution ──
 
 const OVERRIDES_DIR = '.xtcms/overrides';
-const CORE_FALLBACK_DIR = 'src/core/fallback'; // minimal fallback layouts
 
 /**
  * Find a file along the template chain, checking from highest priority to lowest:
@@ -203,12 +202,6 @@ export function resolveTemplateFile(relativePath: string, chain?: string[]): Res
     }
   }
 
-  // 3. Core fallback
-  const fallbackPath = path.join(cwd, CORE_FALLBACK_DIR, relativePath);
-  if (fs.existsSync(fallbackPath)) {
-    return { path: relativePath, source: 'core-fallback', absPath: fallbackPath };
-  }
-
   return null;
 }
 
@@ -222,12 +215,6 @@ export function listTemplateFiles(subdir: string, chain?: string[]): ResolvedFil
   const fileMap = new Map<string, ResolvedFile>();
 
   // Process in priority order (highest last = wins in map)
-  // Core fallback first (lowest priority)
-  const fallbackDir = path.join(cwd, CORE_FALLBACK_DIR, subdir);
-  if (fs.existsSync(fallbackDir)) {
-    collectFiles(fallbackDir, subdir, 'core-fallback', fileMap);
-  }
-
   // Templates root → child
   for (const tplName of templateChain) {
     const reg = getRegistry();

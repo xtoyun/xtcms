@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import { getContent } from '$core/content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent } from '../../core/content';
 const services = getContent('services', 'src/content/services')
   .sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 ---

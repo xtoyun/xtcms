@@ -144,4 +144,4 @@ settings:
     file: src/content/settings/social.yml
     fields:
       - { label: GitHub, name: github, widget: string, required: false }
-      - { label: 微信二维码图片, name: wechat_qr, widget: image, required: false }
+      - { label: 微信二维码, name: wechat_qr, widget: image, required: false }

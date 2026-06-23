@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent } from '../../core/content';
+import { marked } from 'marked';
+
+const { slug } = Astro.params;
+const works = getContent('works', 'src/content/works');
+const work = works.find(w => w.slug === slug);
+if (!work) return Astro.redirect('/works');
+const htmlBody = work.body ? marked.parse(work.body) : '';
+---
+<BaseLayout title={work.data.title}>
+  <section style="padding: 60px 0; max-width: 900px; margin: 0 auto; padding-left: 40px; padding-right: 40px;">
+    <a href="/works" style="font-size: 13px; color: var(--xt-muted); text-decoration: none;">← Back to works</a>
+    <div style="margin-top: 40px;">
+      {work.data.image && (
+        <img src={work.data.image} alt={work.data.title} style="width: 100%; max-height: 600px; object-fit: cover; margin-bottom: 40px; border-radius: 2px;" />
+      )}
+      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+        <span style="font-size: 12px; color: var(--xt-muted); background: #f0f0f0; padding: 4px 12px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px;">{work.data.category}</span>
+        {work.data.date && <span style="font-size: 13px; color: var(--xt-muted);">{String(work.data.date).slice(0, 10)}</span>}
+      </div>
+      <h1 style="font-size: 42px; font-weight: 300; color: var(--xt-primary); margin-bottom: 20px; line-height: 1.2;">{work.data.title}</h1>
+      <p style="font-size: 18px; color: var(--xt-muted); line-height: 1.8; margin-bottom: 40px;">{work.data.description}</p>
+      {htmlBody && <div class="cms-content" set:html={htmlBody} />}
+    </div>
+  </section>
+</BaseLayout>
+<style is:inline>
+  .cms-content h2 { font-size: 24px; font-weight: 300; margin-top: 2em; margin-bottom: 0.5em; }
+  .cms-content h3 { font-size: 20px; font-weight: 400; margin-top: 1.5em; }
+  .cms-content p { margin-bottom: 1em; line-height: 1.9; font-size: 16px; }
+  .cms-content img { max-width: 100%; margin: 30px 0; border-radius: 2px; }
+  .cms-content blockquote { border-left: 2px solid var(--xt-primary); padding-left: 20px; margin: 30px 0; font-style: italic; color: var(--xt-muted); }
+</style>

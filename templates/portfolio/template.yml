@@ -1,0 +1,39 @@
+name: portfolio
+version: 1.0.0
+type: portfolio
+label: Portfolio Template
+description: Minimal portfolio showcase. Perfect for designers, photographers, and studios to display work with client testimonials.
+author: xtcms
+license: MIT
+
+extends: blog
+
+supports:
+  - posts
+  - pages
+  - works
+  - testimonials
+
+layouts:
+  homepage: hero-grid
+  work: full-image
+  post: sidebar
+
+features:
+  - responsive
+  - dark-mode
+
+customizable:
+  colors:
+    - { name: primary, label: 主色调, type: color, default: "#1a1a2e" }
+    - { name: bg, label: 背景色, type: color, default: "#fafafa" }
+    - { name: accent, label: 强调色, type: color, default: "#e94560" }
+
+  typography:
+    - { name: heading_font, label: 标题字体, type: select, options: ["PingFang SC", "Noto Serif SC", "Inter", "Georgia"], default: "PingFang SC" }
+
+  layout:
+    - { name: container_width, label: 内容区宽度, type: select, options: ["960px", "1100px", "1300px", "100%"], default: "1200px" }
+
+requires:
+  xtcms: ">=1.0.0"

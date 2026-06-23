@@ -1,0 +1,63 @@
+# Portfolio template collections — extends blog (inherits posts + pages)
+collections:
+  - name: works
+    label: Works
+    label_singular: Work
+    folder: src/content/works
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}} — {{category}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [featured, date, title]
+      default:
+        field: featured
+        direction: Descending
+    view_groups:
+      - label: Featured
+        field: featured
+        pattern: "true"
+      - label: All Works
+        field: featured
+        pattern: "false"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text }
+      - { label: Category, name: category, widget: select, options: ["Branding", "UI/UX", "Photography", "Illustration", "Video", "Other"] }
+      - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: Cover Image, name: image, widget: image, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: Content, name: body, widget: markdown, required: false }
+
+  - name: testimonials
+    label: Testimonials
+    label_singular: Testimonial
+    folder: src/content/testimonials
+    create: true
+    slug: "{{slug}}"
+    summary: "{{name}} — {{company}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [order, name]
+      default:
+        field: order
+        direction: Ascending
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Company, name: company, widget: string, required: false }
+      - { label: Avatar, name: avatar, widget: image, required: false }
+      - { label: Quote, name: quote, widget: text }
+      - { label: Order, name: order, widget: number, default: 0, value_type: int }
+
+settings:
+  - name: homepage
+    label: Homepage Settings
+    file: src/content/settings/homepage.yml
+    fields:
+      - { label: Hero Title, name: hero_title, widget: string, default: "I design & build" }
+      - { label: Hero Subtitle, name: hero_subtitle, widget: string, default: "digital experiences." }
+      - { label: About Text, name: about_text, widget: text, default: "A designer and developer passionate about creating beautiful, functional work." }
+      - { label: Works Count, name: works_count, widget: number, default: 6, value_type: int }
