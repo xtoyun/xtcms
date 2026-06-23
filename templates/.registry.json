@@ -26,6 +26,15 @@
       "extends": "blog",
       "installedAt": "2026-06-22T06:16:02.210Z",
       "path": "templates/portfolio"
+    },
+    "docs": {
+      "name": "docs",
+      "label": "文档模板",
+      "version": "1.0.0",
+      "source": "builtin",
+      "extends": "blog",
+      "installedAt": "2026-06-23T08:00:41.351Z",
+      "path": "templates/docs"
     }
   },
   "active": "portfolio"

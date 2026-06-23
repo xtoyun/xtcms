@@ -1,0 +1,28 @@
+name: docs
+version: 1.0.0
+type: docs
+label: 文档模板
+description: 文档站点模板。支持上下级目录、侧边栏导航树，适合产品文档、API 文档、知识库。
+author: xtcms
+license: MIT
+
+extends: blog
+
+supports:
+  - docs
+  - pages
+
+features:
+  - responsive
+  - sidebar-tree
+
+customizable:
+  colors:
+    - { name: primary, label: 主色调, type: color, default: "#1a1a2e" }
+    - { name: accent, label: 链接色, type: color, default: "#0066cc" }
+
+  layout:
+    - { name: sidebar_width, label: 侧边栏宽度, type: select, options: ["240px", "280px", "320px"], default: "260px" }
+
+requires:
+  xtcms: ">=1.0.0"

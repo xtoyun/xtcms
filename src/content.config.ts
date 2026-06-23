@@ -56,57 +56,13 @@ const links = defineCollection({
   }),
 });
 
-const projects = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+const docs = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/docs' }),
   schema: z.object({
     title: z.string(),
-    description: z.string(),
-    category: z.string(),
-    client: z.string().optional(),
-    date: z.coerce.string().optional(),
-    image: z.string().optional(),
-    featured: z.boolean().optional().default(false),
-    pinned: z.boolean().optional().default(false),
-    link: z.string().optional(),
-  }),
-});
-
-const services = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/services' }),
-  schema: z.object({
-    title: z.string(),
-    image: z.string().optional(),
-    description: z.string(),
     order: z.number().optional(),
-    date: z.coerce.string().optional(),
-    pinned: z.boolean().optional().default(false),
+    parent: z.string().optional(),
   }),
 });
 
-const products = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/products' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    category: z.string(),
-    price: z.string().optional(),
-    date: z.coerce.string().optional(),
-    image: z.string().optional(),
-    featured: z.boolean().optional().default(false),
-    pinned: z.boolean().optional().default(false),
-  }),
-});
-
-const opensource = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/opensource' }),
-  schema: z.object({
-    title: z.string(),
-    tag: z.string(),
-    description: z.string(),
-    image: z.string().optional(),
-    link: z.string().optional(),
-    order: z.number().optional(),
-  }),
-});
-
-export const collections = { posts, pages, keywords, messages, links, projects, services, products, opensource };
+export const collections = { posts, pages, keywords, messages, links, docs };

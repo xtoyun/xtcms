@@ -7,7 +7,7 @@ const { slug } = Astro.params;
 const pageSlug = slug || 'index';
 
 // Skip known collection routes — let dedicated pages handle them
-const knownRoutes = ['projects', 'services', 'products', 'posts', 'contact', 'admin', 'api', 'open', 'works'];
+const knownRoutes = ['docs', 'projects', 'services', 'products', 'posts', 'contact', 'admin', 'api', 'open', 'works'];
 if (knownRoutes.includes(pageSlug)) {
   return Astro.redirect('/404');
 }

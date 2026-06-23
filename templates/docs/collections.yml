@@ -1,0 +1,29 @@
+collections:
+  - name: docs
+    label: 文档
+    label_singular: 文档
+    folder: src/content/docs
+    create: true
+    identifier_field: title
+    slug: "{{fields._slug}}"
+    summary: "{{title}}"
+    editor:
+      preview: false
+    sortable_fields:
+      fields: [order, title]
+      default:
+        field: order
+        direction: Ascending
+    fields:
+      - { label: 标题, name: title, widget: string }
+      - { label: 排序, name: order, widget: number, default: 0, value_type: int, hint: "数字越小越靠前" }
+      - { label: 父级, name: parent, widget: string, required: false, hint: "留空为顶级，填父文档 slug 建立上下级" }
+      - { label: 正文, name: body, widget: markdown }
+
+settings:
+  - name: docs
+    label: 文档设置
+    file: src/content/settings/docs.yml
+    fields:
+      - { label: 文档标题, name: docs_title, widget: string, default: "文档中心" }
+      - { label: 文档描述, name: docs_description, widget: text, default: "产品文档与使用指南" }

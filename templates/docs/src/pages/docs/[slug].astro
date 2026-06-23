@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent } from '../../core/content';
+import { autoLinkKeywords } from '../../core/auto-link';
+import { marked } from 'marked';
+
+const { slug } = Astro.params;
+const docs = getContent('docs', 'src/content/docs');
+const doc = docs.find(d => d.slug === slug);
+
+if (!doc) return Astro.redirect('/docs');
+
+const rawHtml = doc.body ? marked.parse(doc.body) : '';
+const htmlContent = autoLinkKeywords(rawHtml as string);
+---
+
+<BaseLayout title={doc.data.title}>
+  <article>
+    <h1>{doc.data.title}</h1>
+    {htmlContent ? (
+      <div set:html={htmlContent} />
+    ) : (
+      <p style="color:#999;padding:40px 0">暂无正文内容</p>
+    )}
+  </article>
+</BaseLayout>

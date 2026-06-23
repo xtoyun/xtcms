@@ -1,0 +1,12 @@
+---
+import { getContent } from '../../core/content';
+
+const docs = getContent('docs', 'src/content/docs')
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+const firstDoc = docs[0];
+
+if (firstDoc) {
+  return Astro.redirect(`/docs/${firstDoc.slug}`);
+}
+---
+<html><body style="padding:40px;font-family:sans-serif"><p>No docs yet. <a href="/admin/">Create docs in CMS</a></p></body></html>
